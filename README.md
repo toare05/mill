@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 공군 지원 1차 점수 계산기
 
-## Getting Started
+공군 지원자들이 자신의 1차 점수를 계산할 수 있는 웹 애플리케이션입니다. 자격/면허, 전공, 출결, 가산점 등의 정보를 입력하면 실시간으로 점수가 계산되어 표시됩니다.
 
-First, run the development server:
+## 주요 기능
+
+- 일반기술병과 전문기술병에 따른 다른 점수 체계 적용
+- 자격/면허, 전공, 출결, 가산점을 포함한 1차 점수 계산
+- 실시간 점수 계산 및 시각화
+- 모바일 및 데스크톱 환경에서 모두 사용 가능한 반응형 디자인
+
+## 기술 스택
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- shadcn/ui 컴포넌트 라이브러리
+
+## 설치 및 실행
 
 ```bash
+# 저장소 클론
+git clone https://github.com/yourusername/military-score-calculator.git
+cd military-score-calculator
+
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 사용 방법
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. 군인 유형을 선택합니다 (일반기술병 또는 전문기술병).
+2. 자격/면허, 전공(전문기술병만 해당), 출결 상황을 선택합니다.
+3. 해당하는 가산점 항목을 체크합니다.
+4. 오른쪽에 실시간으로 계산된 점수를 확인합니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 참고 사항
 
-## Learn More
+- 본 계산기는 공군 지원 1차 점수만 계산하며, 면접 점수는 포함되지 않습니다.
+- 정확한 점수는 병무청 공식 홈페이지를 참고하시기 바랍니다.
 
-To learn more about Next.js, take a look at the following resources:
+## 라이센스
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

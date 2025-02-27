@@ -1,101 +1,137 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  AttendanceType, 
+  BonusPointType, 
+  CertificateType, 
+  MajorType, 
+  SoldierType, 
+  UserInputData 
+} from "@/types";
+import { calculateScore } from "@/utils/calculateScore";
+import { MAX_SCORES } from "@/constants/scores";
+import ScoreForm from "@/components/ScoreForm";
+import ScoreResultComponent from "@/components/ScoreResult";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  // 초기 사용자 입력 데이터
+  const initialUserData: UserInputData = {
+    soldierType: "general",
+    certificate: "none",
+    major: "nonMajor",
+    attendance: "absence0",
+    bonusPoints: []
+  };
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // 사용자 입력 데이터 상태
+  const [userData, setUserData] = useState<UserInputData>(initialUserData);
+  
+  // 점수 계산 결과
+  const scoreResult = calculateScore(userData);
+
+  // 군인 유형 변경 핸들러
+  const handleSoldierTypeChange = (type: SoldierType) => {
+    setUserData({
+      ...userData,
+      soldierType: type,
+      certificate: "none"
+    });
+  };
+
+  // 자격/면허 변경 핸들러
+  const handleCertificateChange = (cert: CertificateType) => {
+    setUserData({
+      ...userData,
+      certificate: cert
+    });
+  };
+
+  // 전공 변경 핸들러
+  const handleMajorChange = (major: MajorType) => {
+    setUserData({
+      ...userData,
+      major
+    });
+  };
+
+  // 출결 상황 변경 핸들러
+  const handleAttendanceChange = (attendance: AttendanceType) => {
+    setUserData({
+      ...userData,
+      attendance
+    });
+  };
+
+  // 가산점 변경 핸들러
+  const handleBonusPointsChange = (bonusPoints: BonusPointType[]) => {
+    setUserData({
+      ...userData,
+      bonusPoints
+    });
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">공군 지원 1차 점수 계산기</h1>
+          <p className="text-gray-600">자격/면허, 전공, 출결, 가산점을 입력하여 1차 점수를 계산해보세요.</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* 입력 폼 */}
+          <div className="lg:col-span-2">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <CardHeader className="border-b border-gray-100 p-6">
+                <CardTitle>점수 계산 입력</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <Tabs defaultValue="general" onValueChange={(value) => handleSoldierTypeChange(value as SoldierType)}>
+                  <TabsList className="mb-6 w-full">
+                    <TabsTrigger value="general" className="flex-1">일반기술병(일반직종)</TabsTrigger>
+                    <TabsTrigger value="specialized" className="flex-1">전문기술병</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="general">
+                    <ScoreForm
+                      userData={userData}
+                      onCertificateChange={handleCertificateChange}
+                      onMajorChange={handleMajorChange}
+                      onAttendanceChange={handleAttendanceChange}
+                      onBonusPointsChange={handleBonusPointsChange}
+                    />
+                  </TabsContent>
+                  <TabsContent value="specialized">
+                    <ScoreForm
+                      userData={userData}
+                      onCertificateChange={handleCertificateChange}
+                      onMajorChange={handleMajorChange}
+                      onAttendanceChange={handleAttendanceChange}
+                      onBonusPointsChange={handleBonusPointsChange}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 점수 결과 */}
+          <div className="lg:col-span-1">
+            <ScoreResultComponent 
+              scoreResult={scoreResult} 
+              soldierType={userData.soldierType} 
+              maxScore={MAX_SCORES[userData.soldierType]} 
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 text-center text-sm text-gray-500">
+          <p>※ 본 계산기는 공군 지원 1차 점수만 계산하며, 면접 점수는 포함되지 않습니다.</p>
+          <p>※ 정확한 점수는 병무청 공식 홈페이지를 참고하시기 바랍니다.</p>
+        </div>
+      </div>
+    </main>
   );
 }
