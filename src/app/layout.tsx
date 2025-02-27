@@ -33,11 +33,6 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <meta name="google-adsense-account" content="ca-pub-6559398788369653" />
-        <Script id="adsense-init">
-          {`
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          `}
-        </Script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

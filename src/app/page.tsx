@@ -151,12 +151,13 @@ export default function Home() {
             구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
             예: <GoogleAdsense slot="1234567890" /> -> <GoogleAdsense slot="5678901234" />
           */}
-          {/* 실제 광고 ID 직접 사용 */}
-          <GoogleAdsense
-            slot="6559398788369653"
-            format="auto"
-            responsive={true}
-          />
+          {/* 임시 광고 위치 표시 */}
+          <div className="w-full h-[250px] bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 font-bold rounded-lg">
+            <div className="text-center">
+              <p>광고가 표시될 위치 (상단)</p>
+              <p className="text-sm mt-2">728x90 또는 반응형 광고</p>
+            </div>
+          </div>
         </div>
 
         <div className="text-center mb-8">
@@ -259,12 +260,13 @@ export default function Home() {
             구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
             예: <GoogleAdsense slot="0987654321" /> -> <GoogleAdsense slot="9876543210" />
           */}
-          {/* 실제 광고 ID 직접 사용 */}
-          <GoogleAdsense
-            slot="6559398788369653"
-            format="auto"
-            responsive={true}
-          />
+          {/* 임시 광고 위치 표시 */}
+          <div className="w-full h-[250px] bg-green-100 border-2 border-green-300 flex items-center justify-center text-green-600 font-bold rounded-lg">
+            <div className="text-center">
+              <p>광고가 표시될 위치 (하단)</p>
+              <p className="text-sm mt-2">728x90 또는 반응형 광고</p>
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
