@@ -72,7 +72,7 @@ export default function ScoreForm({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* 자격/면허 선택 */}
       <div className="form-section p-4 bg-gray-50 rounded-lg border border-gray-200">
         <Label htmlFor="certificate" className="text-base font-medium text-blue-700 block mb-3">자격/면허</Label>
@@ -139,17 +139,33 @@ export default function ScoreForm({
       <div className="form-section p-4 bg-gray-50 rounded-lg border border-gray-200">
         <Label className="text-base font-medium text-blue-700 block mb-3">가산점 (최대 15점)</Label>
         
-        {BONUS_POINT_OPTIONS.map((category) => (
-          <div key={category.category} className="space-y-2 mt-4 first:mt-0">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">{category.category}</h4>
-            {category.category === '사회봉사활동 (같은 종류 중복 불가)' && (
-              <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
-            )}
-            {category.category === '헌혈 (같은 종류 중복 불가)' && (
-              <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
-            )}
+        {/* 신분 및 가족 관련 (가로 배치) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">신분 및 가족 관련</h4>
             <div className="space-y-2">
-              {category.options.map((option) => (
+              {BONUS_POINT_OPTIONS.filter(cat => cat.category === '신분 관련' || cat.category === '가족 관련')
+                .flatMap(cat => cat.options)
+                .map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                    <Checkbox 
+                      id={option.value} 
+                      checked={userData.bonusPoints.includes(option.value)}
+                      onCheckedChange={(checked) => 
+                        handleBonusPointChange(checked as boolean, option.value)
+                      }
+                    />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                  </div>
+                ))}
+            </div>
+          </div>
+          
+          {/* 특기 관련 */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">특기 관련</h4>
+            <div className="space-y-2">
+              {BONUS_POINT_OPTIONS.find(cat => cat.category === '특기 관련')?.options.map((option) => (
                 <div key={option.value} className="flex items-center space-x-2 checkbox-option">
                   <Checkbox 
                     id={option.value} 
@@ -163,7 +179,119 @@ export default function ScoreForm({
               ))}
             </div>
           </div>
-        ))}
+        </div>
+        
+        {/* 사회봉사 및 헌혈 (드롭다운, 가로 배치) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* 사회봉사활동 드롭다운 */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">사회봉사활동</h4>
+            <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
+            <div className="select-container">
+              <Select 
+                value={userData.bonusPoints.find(bp => bp.startsWith('volunteerHours')) || ""}
+                onValueChange={(value) => {
+                  if (value) {
+                    handleBonusPointChange(true, value as BonusPointType);
+                  } else {
+                    // 선택 해제 로직
+                    const currentVolunteer = userData.bonusPoints.find(bp => bp.startsWith('volunteerHours'));
+                    if (currentVolunteer) {
+                      handleBonusPointChange(false, currentVolunteer);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="사회봉사활동 시간 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">선택 안함</SelectItem>
+                  {BONUS_POINT_OPTIONS.find(cat => cat.category === '사회봉사활동 (같은 종류 중복 불가)')?.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {/* 헌혈 드롭다운 */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">헌혈</h4>
+            <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
+            <div className="select-container">
+              <Select 
+                value={userData.bonusPoints.find(bp => bp.startsWith('bloodDonation')) || ""}
+                onValueChange={(value) => {
+                  if (value) {
+                    handleBonusPointChange(true, value as BonusPointType);
+                  } else {
+                    // 선택 해제 로직
+                    const currentBlood = userData.bonusPoints.find(bp => bp.startsWith('bloodDonation'));
+                    if (currentBlood) {
+                      handleBonusPointChange(false, currentBlood);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="헌혈 횟수 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">선택 안함</SelectItem>
+                  {BONUS_POINT_OPTIONS.find(cat => cat.category === '헌혈 (같은 종류 중복 불가)')?.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        
+        {/* 자격증 및 영어 성적 (가로 배치) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 자격증 관련 */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">자격증 관련</h4>
+            <div className="space-y-2">
+              {BONUS_POINT_OPTIONS.find(cat => cat.category === '자격증 관련')?.options.map((option) => (
+                <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                  <Checkbox 
+                    id={option.value} 
+                    checked={userData.bonusPoints.includes(option.value)}
+                    onCheckedChange={(checked) => 
+                      handleBonusPointChange(checked as boolean, option.value)
+                    }
+                  />
+                  <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* 영어 성적 */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">영어 성적</h4>
+            <div className="space-y-2">
+              {BONUS_POINT_OPTIONS.find(cat => cat.category === '영어 성적')?.options.map((option) => (
+                <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                  <Checkbox 
+                    id={option.value} 
+                    checked={userData.bonusPoints.includes(option.value)}
+                    onCheckedChange={(checked) => 
+                      handleBonusPointChange(checked as boolean, option.value)
+                    }
+                  />
+                  <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

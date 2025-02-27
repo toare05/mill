@@ -162,10 +162,20 @@
 
   /* 가산점 카테고리 스타일 */
   .form-section .checkbox-option {
-    @apply py-1 px-2 rounded-md transition-colors duration-150;
+    @apply py-1 px-2 rounded-md transition-colors duration-150 flex items-center;
   }
 
   .form-section .checkbox-option:hover {
     @apply bg-gray-100;
+  }
+  
+  /* 그리드 섹션 스타일 */
+  .form-section h4 {
+    @apply text-sm font-medium text-gray-700 border-b pb-1 mb-2;
+  }
+  
+  /* 드롭다운 스타일 */
+  .form-section .select-container {
+    @apply mt-1;
   }
 }
