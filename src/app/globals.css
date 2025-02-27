@@ -156,26 +156,12 @@
     @apply shadow-md;
   }
 
-  .form-section-title {
-    @apply text-base font-medium mb-4 pb-2 border-b border-gray-200 text-gray-700;
-  }
-
-  /* 가산점 카테고리 스타일 */
-  .form-section .checkbox-option {
+  /* 체크박스 옵션 스타일 */
+  .checkbox-option {
     @apply py-1 px-2 rounded-md transition-colors duration-150 flex items-center;
   }
 
-  .form-section .checkbox-option:hover {
+  .checkbox-option:hover {
     @apply bg-gray-100;
-  }
-  
-  /* 그리드 섹션 스타일 */
-  .form-section h4 {
-    @apply text-sm font-medium text-gray-700 border-b pb-1 mb-2;
-  }
-  
-  /* 드롭다운 스타일 */
-  .form-section .select-container {
-    @apply mt-1;
   }
 }

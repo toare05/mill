@@ -124,12 +124,12 @@ export default function ScoreForm({
           className="space-y-2"
         >
           {ATTENDANCE_OPTIONS[userData.soldierType].map((option) => (
-            <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+            <div key={option.value} className="checkbox-option">
               <RadioGroupItem 
                 value={option.value} 
                 id={option.value}
               />
-              <Label htmlFor={option.value}>{option.label}</Label>
+              <Label htmlFor={option.value} className="ml-2">{option.label}</Label>
             </div>
           ))}
         </RadioGroup>
@@ -139,15 +139,15 @@ export default function ScoreForm({
       <div className="form-section p-4 bg-gray-50 rounded-lg border border-gray-200">
         <Label className="text-base font-medium text-blue-700 block mb-3">가산점 (최대 15점)</Label>
         
-        {/* 신분 및 가족 관련 (가로 배치) */}
+        {/* 신분 및 가족 관련 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">신분 및 가족 관련</h4>
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">신분 및 가족 관련</h4>
             <div className="space-y-2">
               {BONUS_POINT_OPTIONS.filter(cat => cat.category === '신분 관련' || cat.category === '가족 관련')
                 .flatMap(cat => cat.options)
                 .map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                  <div key={option.value} className="checkbox-option">
                     <Checkbox 
                       id={option.value} 
                       checked={userData.bonusPoints.includes(option.value)}
@@ -155,7 +155,7 @@ export default function ScoreForm({
                         handleBonusPointChange(checked as boolean, option.value)
                       }
                     />
-                    <Label htmlFor={option.value}>{option.label}</Label>
+                    <Label htmlFor={option.value} className="ml-2">{option.label}</Label>
                   </div>
                 ))}
             </div>
@@ -163,10 +163,10 @@ export default function ScoreForm({
           
           {/* 특기 관련 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">특기 관련</h4>
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">특기 관련</h4>
             <div className="space-y-2">
               {BONUS_POINT_OPTIONS.find(cat => cat.category === '특기 관련')?.options.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                <div key={option.value} className="checkbox-option">
                   <Checkbox 
                     id={option.value} 
                     checked={userData.bonusPoints.includes(option.value)}
@@ -174,27 +174,27 @@ export default function ScoreForm({
                       handleBonusPointChange(checked as boolean, option.value)
                     }
                   />
-                  <Label htmlFor={option.value}>{option.label}</Label>
+                  <Label htmlFor={option.value} className="ml-2">{option.label}</Label>
                 </div>
               ))}
             </div>
           </div>
         </div>
         
-        {/* 사회봉사 및 헌혈 (드롭다운, 가로 배치) */}
+        {/* 사회봉사 및 헌혈 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <p className="text-xs text-blue-600 mb-2 col-span-full">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
+          
           {/* 사회봉사활동 드롭다운 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">사회봉사활동</h4>
-            <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
-            <div className="select-container">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">사회봉사활동</h4>
+            <div className="mt-1">
               <Select 
-                value={userData.bonusPoints.find(bp => bp.startsWith('volunteerHours')) || ""}
+                value={userData.bonusPoints.find(bp => bp.startsWith('volunteerHours')) || "none"}
                 onValueChange={(value) => {
-                  if (value) {
+                  if (value !== "none") {
                     handleBonusPointChange(true, value as BonusPointType);
                   } else {
-                    // 선택 해제 로직
                     const currentVolunteer = userData.bonusPoints.find(bp => bp.startsWith('volunteerHours'));
                     if (currentVolunteer) {
                       handleBonusPointChange(false, currentVolunteer);
@@ -219,16 +219,14 @@ export default function ScoreForm({
           
           {/* 헌혈 드롭다운 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">헌혈</h4>
-            <p className="text-xs text-blue-600 mb-2">※ 사회봉사활동과 헌혈 점수의 합계는 최대 8점까지만 인정됩니다.</p>
-            <div className="select-container">
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">헌혈</h4>
+            <div className="mt-1">
               <Select 
-                value={userData.bonusPoints.find(bp => bp.startsWith('bloodDonation')) || ""}
+                value={userData.bonusPoints.find(bp => bp.startsWith('bloodDonation')) || "none"}
                 onValueChange={(value) => {
-                  if (value) {
+                  if (value !== "none") {
                     handleBonusPointChange(true, value as BonusPointType);
                   } else {
-                    // 선택 해제 로직
                     const currentBlood = userData.bonusPoints.find(bp => bp.startsWith('bloodDonation'));
                     if (currentBlood) {
                       handleBonusPointChange(false, currentBlood);
@@ -252,14 +250,14 @@ export default function ScoreForm({
           </div>
         </div>
         
-        {/* 자격증 및 영어 성적 (가로 배치) */}
+        {/* 자격증 및 영어 성적 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 자격증 관련 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">자격증 관련</h4>
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">자격증 관련</h4>
             <div className="space-y-2">
               {BONUS_POINT_OPTIONS.find(cat => cat.category === '자격증 관련')?.options.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                <div key={option.value} className="checkbox-option">
                   <Checkbox 
                     id={option.value} 
                     checked={userData.bonusPoints.includes(option.value)}
@@ -267,7 +265,7 @@ export default function ScoreForm({
                       handleBonusPointChange(checked as boolean, option.value)
                     }
                   />
-                  <Label htmlFor={option.value}>{option.label}</Label>
+                  <Label htmlFor={option.value} className="ml-2">{option.label}</Label>
                 </div>
               ))}
             </div>
@@ -275,10 +273,10 @@ export default function ScoreForm({
           
           {/* 영어 성적 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1">영어 성적</h4>
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">영어 성적</h4>
             <div className="space-y-2">
               {BONUS_POINT_OPTIONS.find(cat => cat.category === '영어 성적')?.options.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2 checkbox-option">
+                <div key={option.value} className="checkbox-option">
                   <Checkbox 
                     id={option.value} 
                     checked={userData.bonusPoints.includes(option.value)}
@@ -286,7 +284,7 @@ export default function ScoreForm({
                       handleBonusPointChange(checked as boolean, option.value)
                     }
                   />
-                  <Label htmlFor={option.value}>{option.label}</Label>
+                  <Label htmlFor={option.value} className="ml-2">{option.label}</Label>
                 </div>
               ))}
             </div>
