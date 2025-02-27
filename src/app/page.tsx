@@ -102,9 +102,23 @@ export default function Home() {
   
   // 특기 변경 핸들러
   const handleSpecialtyChange = (specialty: SpecialtyType) => {
+    let updatedCertificate = userData.certificate;
+    
+    // 차량운전 특기에서 다른 특기로 변경될 때 운전면허 관련 자격증을 선택한 상태라면 자격증을 'none'으로 변경
+    if (userData.specialty === 'driving' && specialty !== 'driving') {
+      if (
+        userData.certificate === 'largeSpecial' || 
+        userData.certificate === 'type1Manual' || 
+        userData.certificate === 'type2Manual'
+      ) {
+        updatedCertificate = 'none';
+      }
+    }
+    
     setUserData({
       ...userData,
-      specialty
+      specialty,
+      certificate: updatedCertificate
     });
   };
   

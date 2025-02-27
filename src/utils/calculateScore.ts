@@ -9,7 +9,18 @@ import { ScoreResult, UserInputData } from "@/types";
 
 export function calculateScore(userData: UserInputData): ScoreResult {
   // 자격/면허 점수 계산
-  const certificateScore = CERTIFICATE_SCORES[userData.soldierType][userData.certificate];
+  let certificateScore = CERTIFICATE_SCORES[userData.soldierType][userData.certificate];
+  
+  // 운전면허 관련 자격증은 차량운전 특기일 때만 점수 부여
+  if (userData.soldierType === 'specialized' && 
+      (userData.certificate === 'largeSpecial' || 
+       userData.certificate === 'type1Manual' || 
+       userData.certificate === 'type2Manual')) {
+    if (userData.specialty !== 'driving') {
+      // 차량운전 특기가 아닌 경우 'none'과 동일한 점수 부여
+      certificateScore = CERTIFICATE_SCORES[userData.soldierType]['none'];
+    }
+  }
   
   // 전공 점수 계산
   const majorScore = MAJOR_SCORES[userData.soldierType][userData.major];

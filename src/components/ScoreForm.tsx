@@ -5,6 +5,7 @@ import {
   BonusPointType, 
   CertificateType, 
   MajorType, 
+  SpecialtyType,
   UserInputData 
 } from "@/types";
 import { 
@@ -71,6 +72,22 @@ export default function ScoreForm({
     }
   };
 
+  // 자격/면허 옵션 필터링 함수
+  const getFilteredCertificateOptions = () => {
+    const options = [...CERTIFICATE_OPTIONS[userData.soldierType]];
+    
+    // 전문기술병이고 차량운전 특기가 아닌 경우 운전면허 관련 옵션 제거
+    if (userData.soldierType === 'specialized' && userData.specialty !== 'driving') {
+      return options.filter(option => 
+        option.value !== 'largeSpecial' && 
+        option.value !== 'type1Manual' && 
+        option.value !== 'type2Manual'
+      );
+    }
+    
+    return options;
+  };
+
   return (
     <div className="space-y-6">
       {/* 자격/면허 선택 */}
@@ -84,7 +101,7 @@ export default function ScoreForm({
             <SelectValue placeholder="자격/면허를 선택하세요" />
           </SelectTrigger>
           <SelectContent>
-            {CERTIFICATE_OPTIONS[userData.soldierType].map((option) => (
+            {getFilteredCertificateOptions().map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
