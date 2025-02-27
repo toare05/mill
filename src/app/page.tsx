@@ -19,6 +19,7 @@ import { MAX_SCORES } from "@/constants/scores";
 import ScoreForm from "@/components/ScoreForm";
 import ScoreResultComponent from "@/components/ScoreResult";
 import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
+import GoogleAdsense from "@/components/GoogleAdsense";
 
 export default function Home() {
   // 초기 사용자 입력 데이터
@@ -144,6 +145,15 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* 상단 광고 */}
+        <div className="mb-8">
+          {/* 
+            구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
+            예: <GoogleAdsense slot="1234567890" /> -> <GoogleAdsense slot="5678901234" />
+          */}
+          <GoogleAdsense slot="1234567890" />
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">공군 지원 1차 점수 계산기</h1>
           <p className="text-gray-600">자격/면허, 전공, 출결, 가산점을 입력하여 1차 점수를 계산해보세요.</p>
@@ -236,6 +246,15 @@ export default function Home() {
               specialty={userData.specialty}
             />
           </div>
+        </div>
+
+        {/* 하단 광고 */}
+        <div className="mt-8">
+          {/* 
+            구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
+            예: <GoogleAdsense slot="0987654321" /> -> <GoogleAdsense slot="9876543210" />
+          */}
+          <GoogleAdsense slot="0987654321" />
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
