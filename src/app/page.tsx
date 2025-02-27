@@ -260,6 +260,9 @@ export default function Home() {
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>※ 본 계산기는 공군 지원 1차 점수만 계산하며, 면접 점수는 포함되지 않습니다.</p>
           <p>※ 정확한 점수는 병무청 공식 홈페이지를 참고하시기 바랍니다.</p>
+          <p className="mt-2">
+            <a href="/privacy-policy" className="text-blue-500 hover:underline">개인정보 처리방침</a>
+          </p>
         </div>
       </div>
     </main>
