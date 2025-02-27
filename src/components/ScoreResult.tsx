@@ -64,7 +64,7 @@ export default function ScoreResult({
   
   // 현재 점수와 커트라인 비교
   const getComparisonResult = (cutoffScore: number | null) => {
-    if (cutoffScore === null) return null;
+    if (cutoffScore === null || cutoffScore === 99999) return null;
     
     const diff = scoreResult.totalScore - cutoffScore;
     
@@ -83,11 +83,11 @@ export default function ScoreResult({
     }
   };
   
-  const previousComparison = previousMonthData && previousMonthData.score !== null 
+  const previousComparison = previousMonthData && previousMonthData.score !== null && previousMonthData.score !== 99999
     ? getComparisonResult(previousMonthData.score) 
     : null;
   
-  const lastYearComparison = lastYearData && lastYearData.score !== null 
+  const lastYearComparison = lastYearData && lastYearData.score !== null && lastYearData.score !== 99999
     ? getComparisonResult(lastYearData.score) 
     : null;
   
@@ -96,6 +96,13 @@ export default function ScoreResult({
     if (status === "pass") return "text-green-600";
     if (status === "fail") return "text-red-600";
     return "text-gray-500";
+  };
+
+  // 커트라인 점수 표시 텍스트
+  const getCutoffScoreText = (score: number | null) => {
+    if (score === null) return "모집 정보 없음";
+    if (score === 99999) return "모집 없음";
+    return `${score}점`;
   };
 
   return (
@@ -213,20 +220,16 @@ export default function ScoreResult({
                     <h3 className="font-medium text-sm text-gray-700 mb-1">
                       {previousMonthData.year}년 {previousMonthData.month}월 모집 (이전 달)
                     </h3>
-                    {previousMonthData.score !== null ? (
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm">커트라인: <span className="font-medium">{previousMonthData.score}점</span></p>
-                        </div>
-                        {previousComparison && (
-                          <div className={`text-sm font-medium ${getStatusColorClass(previousComparison.status)}`}>
-                            {previousComparison.message}
-                          </div>
-                        )}
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm">커트라인: <span className="font-medium">{getCutoffScoreText(previousMonthData.score)}</span></p>
                       </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">모집 정보 없음</p>
-                    )}
+                      {previousComparison && (
+                        <div className={`text-sm font-medium ${getStatusColorClass(previousComparison.status)}`}>
+                          {previousComparison.message}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 
@@ -236,20 +239,16 @@ export default function ScoreResult({
                     <h3 className="font-medium text-sm text-gray-700 mb-1">
                       {lastYearData.year}년 {lastYearData.month}월 모집 (작년 동월)
                     </h3>
-                    {lastYearData.score !== null ? (
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm">커트라인: <span className="font-medium">{lastYearData.score}점</span></p>
-                        </div>
-                        {lastYearComparison && (
-                          <div className={`text-sm font-medium ${getStatusColorClass(lastYearComparison.status)}`}>
-                            {lastYearComparison.message}
-                          </div>
-                        )}
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm">커트라인: <span className="font-medium">{getCutoffScoreText(lastYearData.score)}</span></p>
                       </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">모집 정보 없음</p>
-                    )}
+                      {lastYearComparison && (
+                        <div className={`text-sm font-medium ${getStatusColorClass(lastYearComparison.status)}`}>
+                          {lastYearComparison.message}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
