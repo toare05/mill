@@ -8,7 +8,7 @@ import {
 
 // 군인 유형 옵션
 export const SOLDIER_TYPE_OPTIONS = [
-  { value: 'general' as SoldierType, label: '일반기술병(일반직종)' },
+  { value: 'general' as SoldierType, label: '일반기술병' },
   { value: 'specialized' as SoldierType, label: '전문기술병(화생방, 의무, 기계, 통신전자전기, 차량정비, 차량운전, 전자계산)' }
 ];
 

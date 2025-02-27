@@ -158,37 +158,22 @@ export const SPECIALTY_TYPE_MAP: Record<string, SpecialtyType> = {
 // 모집 월 옵션 생성
 export const RECRUITMENT_MONTH_OPTIONS = (() => {
   const options = [];
-  const currentYear = 25; // 2025년을 기본값으로 설정
+  const currentYear = 2025; // 2025년을 기본값으로 설정
+  const currentMonth = 6; // 현재 모집 시즌은 2025년 6월
   
-  // 1월부터 12월까지 모든 월 추가
-  for (let month = 1; month <= 12; month++) {
+  // 현재 월부터 12월까지 모든 월 추가
+  for (let month = currentMonth; month <= 12; month++) {
     options.push({
-      value: `${currentYear}.${month}`,
-      label: `${currentYear}.${month}월`
+      value: `${currentYear}년 ${month}월`,
+      label: `${currentYear}년 ${month}월`
     });
   }
   
-  // 기존 데이터에서 옵션 추가 (2024년 데이터)
-  for (const year in CUTOFF_SCORES) {
-    if (parseInt(year) !== currentYear) { // 현재 년도(2025)가 아닌 경우에만 추가
-      for (const month in CUTOFF_SCORES[year]) {
-        options.push({
-          value: `${year}.${month}`,
-          label: `${year}.${month}월`
-        });
-      }
-    }
-  }
-  
-  // 날짜 순으로 정렬
+  // 날짜 순으로 정렬 (월 오름차순)
   options.sort((a, b) => {
-    const [yearA, monthA] = a.value.split('.').map(Number);
-    const [yearB, monthB] = b.value.split('.').map(Number);
-    
-    if (yearA !== yearB) {
-      return yearB - yearA; // 년도 내림차순 (최신 년도가 먼저)
-    }
-    return monthA - monthB; // 월 오름차순
+    const monthA = parseInt(a.value.split('년 ')[1]);
+    const monthB = parseInt(b.value.split('년 ')[1]);
+    return monthA - monthB;
   });
   
   return options;
@@ -196,8 +181,11 @@ export const RECRUITMENT_MONTH_OPTIONS = (() => {
 
 // 특정 년도와 월의 커트라인 점수 가져오기
 export function getCutoffScore(year: number, month: number, specialty: string): number | null {
-  if (CUTOFF_SCORES[year] && CUTOFF_SCORES[year][month]) {
-    return CUTOFF_SCORES[year][month][specialty] || null;
+  // 2자리 년도로 변환 (예: 2024 -> 24)
+  const shortYear = year % 100;
+  
+  if (CUTOFF_SCORES[shortYear] && CUTOFF_SCORES[shortYear][month]) {
+    return CUTOFF_SCORES[shortYear][month][specialty] || null;
   }
   return null;
 }
@@ -212,6 +200,9 @@ export function getPreviousMonthCutoffScore(year: number, month: number, special
     prevMonth = 12;
   }
   
+  // 2자리 년도로 변환 (예: 2024 -> 24)
+  const shortYear = prevYear % 100;
+  
   const score = getCutoffScore(prevYear, prevMonth, specialty);
   
   // 이전 달 정보 반환 (데이터가 없어도 이전 달 정보는 반환)
@@ -221,6 +212,10 @@ export function getPreviousMonthCutoffScore(year: number, month: number, special
 // 작년 같은 달의 커트라인 점수 가져오기
 export function getLastYearSameMonthCutoffScore(year: number, month: number, specialty: string): { year: number, month: number, score: number | null } | null {
   const lastYear = year - 1;
+  
+  // 2자리 년도로 변환 (예: 2024 -> 24)
+  const shortYear = lastYear % 100;
+  
   const score = getCutoffScore(lastYear, month, specialty);
   
   // 작년 같은 달 정보 반환 (데이터가 없어도 작년 같은 달 정보는 반환)

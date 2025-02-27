@@ -44,10 +44,17 @@ export default function ScoreResult({
   // 특기 표시 이름
   const specialtyDisplayName = SPECIALTY_DISPLAY_NAMES[specialty];
   
-  // 모집월 파싱 (예: "24.5" -> { year: 24, month: 5 })
-  const [yearStr, monthStr] = recruitmentMonth.split('.');
-  const year = parseInt(yearStr);
-  const month = parseInt(monthStr);
+  // 모집월 파싱 (예: "2025년 6월" -> { year: 2025, month: 6 })
+  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
+  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
+  
+  if (!yearMatch || !monthMatch) {
+    console.error("Invalid recruitment month format:", recruitmentMonth);
+    return null;
+  }
+  
+  const year = parseInt(yearMatch[1]);
+  const month = parseInt(monthMatch[1]);
   
   // 이전 달 데이터
   const previousMonthData = getPreviousMonthCutoffScore(year, month, specialtyDisplayName);
@@ -204,7 +211,7 @@ export default function ScoreResult({
                 {previousMonthData && (
                   <div className="border-b pb-3">
                     <h3 className="font-medium text-sm text-gray-700 mb-1">
-                      {previousMonthData.year}.{previousMonthData.month}월 모집 (이전 달)
+                      {previousMonthData.year}년 {previousMonthData.month}월 모집 (이전 달)
                     </h3>
                     {previousMonthData.score !== null ? (
                       <div className="flex justify-between items-center">
@@ -227,7 +234,7 @@ export default function ScoreResult({
                 {lastYearData && (
                   <div>
                     <h3 className="font-medium text-sm text-gray-700 mb-1">
-                      {lastYearData.year}.{lastYearData.month}월 모집 (작년 동월)
+                      {lastYearData.year}년 {lastYearData.month}월 모집 (작년 동월)
                     </h3>
                     {lastYearData.score !== null ? (
                       <div className="flex justify-between items-center">

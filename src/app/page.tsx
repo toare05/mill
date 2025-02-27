@@ -28,7 +28,7 @@ export default function Home() {
     major: "nonMajor",
     attendance: "absence0",
     bonusPoints: [],
-    recruitmentMonth: "25.1", // 기본값을 2025년 1월로 설정
+    recruitmentMonth: "2025년 6월", // 기본값을 2025년 6월로 설정
     specialty: "general" // 기본값은 일반(기술)
   };
 
@@ -44,9 +44,9 @@ export default function Home() {
     
     // 군인 유형에 따라 기본 특기 설정
     if (type === "general") {
-      specialty = "general";
+      specialty = "general"; // 일반기술병은 일반기술 하나만 있음
     } else if (type === "specialized") {
-      specialty = "chemical"; // 전문기술병의 경우 화생방을 기본값으로
+      specialty = "electronic"; // 전문기술병의 경우 전자계산을 기본값으로
     }
     
     setUserData({
@@ -112,11 +112,11 @@ export default function Home() {
   const getSpecialtyOptions = () => {
     if (userData.soldierType === "general") {
       return [
-        { value: "general" as SpecialtyType, label: "일반기술" },
-        { value: "electronic" as SpecialtyType, label: "전자계산" }
+        { value: "general" as SpecialtyType, label: "일반기술" }
       ];
     } else {
       return [
+        { value: "electronic" as SpecialtyType, label: "전자계산" },
         { value: "chemical" as SpecialtyType, label: "화생방" },
         { value: "medical" as SpecialtyType, label: "의무" },
         { value: "mechanical" as SpecialtyType, label: "기계" },
@@ -165,30 +165,11 @@ export default function Home() {
                 
                 <Tabs defaultValue="general" onValueChange={(value) => handleSoldierTypeChange(value as SoldierType)}>
                   <TabsList className="mb-6 w-full">
-                    <TabsTrigger value="general" className="flex-1">일반기술병(일반직종)</TabsTrigger>
+                    <TabsTrigger value="general" className="flex-1">일반기술병</TabsTrigger>
                     <TabsTrigger value="specialized" className="flex-1">전문기술병</TabsTrigger>
                   </TabsList>
                   <TabsContent value="general">
-                    {/* 특기 선택 (일반기술병) */}
-                    <div className="form-section p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
-                      <Label htmlFor="specialty" className="text-base font-medium text-blue-700 block mb-3">특기 선택</Label>
-                      <Select
-                        value={userData.specialty}
-                        onValueChange={(value) => handleSpecialtyChange(value as SpecialtyType)}
-                      >
-                        <SelectTrigger id="specialty">
-                          <SelectValue placeholder="특기를 선택하세요" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getSpecialtyOptions().map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
+                    {/* 일반기술병은 특기 선택 칸 없음 - 자동으로 "일반기술" 특기 선택됨 */}
                     <ScoreForm
                       userData={userData}
                       onCertificateChange={handleCertificateChange}
