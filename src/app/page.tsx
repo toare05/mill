@@ -18,7 +18,7 @@ import { calculateScore } from "@/utils/calculateScore";
 import { MAX_SCORES } from "@/constants/scores";
 import ScoreForm from "@/components/ScoreForm";
 import ScoreResultComponent from "@/components/ScoreResult";
-import { RECRUITMENT_MONTH_OPTIONS, SPECIALTY_TYPE_MAP } from "@/constants/cutoffScores";
+import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
 
 export default function Home() {
   // 초기 사용자 입력 데이터

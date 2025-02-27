@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   SPECIALTY_DISPLAY_NAMES, 
-  getCutoffScore,
   getPreviousMonthCutoffScore,
   getLastYearSameMonthCutoffScore
 } from "@/constants/cutoffScores";

@@ -221,9 +221,6 @@ export function getPreviousMonthCutoffScore(year: number, month: number, special
     prevMonth = 12;
   }
   
-  // 2자리 년도로 변환 (예: 2024 -> 24)
-  const shortYear = prevYear % 100;
-  
   const score = getCutoffScore(prevYear, prevMonth, specialty);
   
   // 이전 달 정보 반환 (데이터가 없어도 이전 달 정보는 반환)
@@ -233,9 +230,6 @@ export function getPreviousMonthCutoffScore(year: number, month: number, special
 // 작년 같은 달의 커트라인 점수 가져오기
 export function getLastYearSameMonthCutoffScore(year: number, month: number, specialty: string): { year: number, month: number, score: number | null } | null {
   const lastYear = year - 1;
-  
-  // 2자리 년도로 변환 (예: 2024 -> 24)
-  const shortYear = lastYear % 100;
   
   const score = getCutoffScore(lastYear, month, specialty);
   
