@@ -1,18 +1,28 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScoreResult as ScoreResultType, SoldierType } from "@/types";
+import { 
+  SPECIALTY_DISPLAY_NAMES, 
+  getCutoffScore,
+  getPreviousMonthCutoffScore,
+  getLastYearSameMonthCutoffScore
+} from "@/constants/cutoffScores";
+import { ScoreResult as ScoreResultType, SoldierType, SpecialtyType } from "@/types";
 
 interface ScoreResultProps {
   scoreResult: ScoreResultType;
   soldierType: SoldierType;
   maxScore: number;
+  recruitmentMonth: string;
+  specialty: SpecialtyType;
 }
 
 export default function ScoreResult({ 
   scoreResult, 
   soldierType, 
-  maxScore 
+  maxScore,
+  recruitmentMonth,
+  specialty
 }: ScoreResultProps) {
   // 점수 퍼센트 계산
   const calculatePercent = (score: number, max: number) => {
@@ -28,6 +38,57 @@ export default function ScoreResult({
     if (percent >= 70) return "bg-blue-500";
     if (percent >= 50) return "bg-yellow-500";
     return "bg-red-500";
+  };
+
+  // 커트라인 비교 관련 로직
+  // 특기 표시 이름
+  const specialtyDisplayName = SPECIALTY_DISPLAY_NAMES[specialty];
+  
+  // 모집월 파싱 (예: "24.5" -> { year: 24, month: 5 })
+  const [yearStr, monthStr] = recruitmentMonth.split('.');
+  const year = parseInt(yearStr);
+  const month = parseInt(monthStr);
+  
+  // 이전 달 데이터
+  const previousMonthData = getPreviousMonthCutoffScore(year, month, specialtyDisplayName);
+  
+  // 작년 같은 달 데이터
+  const lastYearData = getLastYearSameMonthCutoffScore(year, month, specialtyDisplayName);
+  
+  // 현재 점수와 커트라인 비교
+  const getComparisonResult = (cutoffScore: number | null) => {
+    if (cutoffScore === null) return null;
+    
+    const diff = scoreResult.totalScore - cutoffScore;
+    
+    if (diff >= 0) {
+      return {
+        status: "pass",
+        diff: diff,
+        message: `커트라인보다 ${diff.toFixed(1)}점 높음`
+      };
+    } else {
+      return {
+        status: "fail",
+        diff: Math.abs(diff),
+        message: `커트라인보다 ${Math.abs(diff).toFixed(1)}점 낮음`
+      };
+    }
+  };
+  
+  const previousComparison = previousMonthData && previousMonthData.score !== null 
+    ? getComparisonResult(previousMonthData.score) 
+    : null;
+  
+  const lastYearComparison = lastYearData && lastYearData.score !== null 
+    ? getComparisonResult(lastYearData.score) 
+    : null;
+  
+  // 상태에 따른 색상 클래스
+  const getStatusColorClass = (status: string | null) => {
+    if (status === "pass") return "text-green-600";
+    if (status === "fail") return "text-red-600";
+    return "text-gray-500";
   };
 
   return (
@@ -131,6 +192,59 @@ export default function ScoreResult({
                     style={{ width: `${calculatePercent(scoreResult.bonusPointsScore, 15)}%` }}
                   ></div>
                 </div>
+              </div>
+            </div>
+
+            {/* 커트라인 비교 섹션 */}
+            <div className="pt-4 border-t border-gray-100">
+              <h4 className="font-medium mb-3">커트라인 비교</h4>
+              
+              <div className="space-y-4">
+                {/* 이전 달 커트라인 */}
+                {previousMonthData && (
+                  <div className="border-b pb-3">
+                    <h3 className="font-medium text-sm text-gray-700 mb-1">
+                      {previousMonthData.year}.{previousMonthData.month}월 모집 (이전 달)
+                    </h3>
+                    {previousMonthData.score !== null ? (
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm">커트라인: <span className="font-medium">{previousMonthData.score}점</span></p>
+                        </div>
+                        {previousComparison && (
+                          <div className={`text-sm font-medium ${getStatusColorClass(previousComparison.status)}`}>
+                            {previousComparison.message}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">모집 정보 없음</p>
+                    )}
+                  </div>
+                )}
+                
+                {/* 작년 같은 달 커트라인 */}
+                {lastYearData && (
+                  <div>
+                    <h3 className="font-medium text-sm text-gray-700 mb-1">
+                      {lastYearData.year}.{lastYearData.month}월 모집 (작년 동월)
+                    </h3>
+                    {lastYearData.score !== null ? (
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm">커트라인: <span className="font-medium">{lastYearData.score}점</span></p>
+                        </div>
+                        {lastYearComparison && (
+                          <div className={`text-sm font-medium ${getStatusColorClass(lastYearComparison.status)}`}>
+                            {lastYearComparison.message}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">모집 정보 없음</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -1,6 +1,17 @@
 // 군인 유형
 export type SoldierType = 'general' | 'specialized';
 
+// 특기 유형
+export type SpecialtyType = 
+  | 'general'        // 일반(기술)
+  | 'electronic'     // 전자계산(일반)
+  | 'chemical'       // 화생방(전문기술)
+  | 'medical'        // 의무(전문기술)
+  | 'mechanical'     // 기계(전문기술)
+  | 'driving'        // 차량운전(전문기술)
+  | 'maintenance'    // 차량정비(전문기술)
+  | 'communication'; // 통신전자전기(전문기술)
+
 // 자격증 유형
 export type CertificateType = 
   | 'nationalEngineer' // 기사 이상
@@ -91,6 +102,8 @@ export interface UserInputData {
   major: MajorType;
   attendance: AttendanceType;
   bonusPoints: BonusPointType[];
+  recruitmentMonth: string;
+  specialty: SpecialtyType;
 }
 
 // 점수 결과
