@@ -19,7 +19,6 @@ import { MAX_SCORES } from "@/constants/scores";
 import ScoreForm from "@/components/ScoreForm";
 import ScoreResultComponent from "@/components/ScoreResult";
 import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
-import GoogleAdsense from "@/components/GoogleAdsense";
 
 export default function Home() {
   // 초기 사용자 입력 데이터
