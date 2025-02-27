@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: "군간부 합격 점수 계산기 | 계산기밀",
+    title: "군간부 합격 점수 계산기",
     description: "군간부 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
     url: "https://allformilitary.site",
     siteName: "계산기밀",
