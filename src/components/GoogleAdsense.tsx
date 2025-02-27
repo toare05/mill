@@ -19,7 +19,7 @@ export default function GoogleAdsense({
 }: GoogleAdsenseProps) {
   useEffect(() => {
     try {
-      // @ts-ignore
+      // @ts-expect-error window.adsbygoogle is added by the AdSense script
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (err) {
       console.error('Adsense error:', err);

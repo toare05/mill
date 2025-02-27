@@ -5,7 +5,6 @@ import {
   BonusPointType, 
   CertificateType, 
   MajorType, 
-  SpecialtyType,
   UserInputData 
 } from "@/types";
 import { 
