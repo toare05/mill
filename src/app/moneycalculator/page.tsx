@@ -27,10 +27,8 @@ interface SavingsInputData {
   isYear2025: boolean;             // 2025년 이후 납입 여부 (한도 55만원)
   selectedBank: string;            // 선택한 은행
   militaryRank?: string;           // 군 계급 (선택사항)
-  savingsRatio?: number;           // 월급 대비 저축 비율 (%)
   monthlySavings2024?: number;     // 2024년 월 납입액 (만원)
   monthlySavings2025?: number;     // 2025년 월 납입액 (만원)
-  remainingSavingsRate: number;    // 월급 나머지 금액 저축 비율 (%)
 }
 
 // 계산 결과 내역 타입 정의
@@ -165,10 +163,8 @@ export default function MoneyCalculator() {
     governmentMatch: true,       // 정부 매칭 지원금 (항상 true로 고정)
     isYear2025: true,            // 2025년 이후 기준 (기본값)
     selectedBank: "국민은행",     // 기본 선택 은행 (남겨두지만 UI에서는 제거)
-    savingsRatio: 30,            // 월급 대비 저축 비율 (기본 30%)
     monthlySavings2024: 40,      // 2024년 월 납입액 (기본 40만원)
     monthlySavings2025: 55,      // 2025년 월 납입액 (기본 55만원)
-    remainingSavingsRate: 100,   // 월급 나머지 금액 100% 저축 (기본값)
   };
 
   // 사용자 입력 데이터 상태
@@ -360,76 +356,181 @@ export default function MoneyCalculator() {
   
   // 장병내일준비적금 수령액 계산 함수
   const calculationResult = useMemo(() => {
-    // 월 납입액 계산 (만원 단위를 원 단위로 변환)
-    // 입대 연도가 2024년인 경우 2024년과 2025년 납입액을 각각 고려
+    // 기본 변수 설정
     let totalDeposit = 0;
-    // 월급에서 저축액을 제외한 나머지 금액의 총합
     let totalRemaining = 0;
     
-    // 월급 정보 미리 계산
-    const salaries = calculateSalaryByRank();
+    // 시작 시점 설정
+    const startMonth = parseInt(enlistmentMonth);
+    const startYear = parseInt(enlistmentYear);
     
-    if (parseInt(enlistmentYear) >= 2025) {
+    // 계급별 개월 수
+    const rankMonths = rankPeriods[militaryType as keyof typeof rankPeriods];
+    
+    // 연도별 적금 한도
+    const deposit2024Max = 400000; // 2024년 40만원 한도
+    const deposit2025Max = 550000; // 2025년 55만원 한도
+    
+    // 월급 객체화 (계급별 월급을 빠르게 조회하기 위해)
+    const salary2024 = {
+      이병: militaryRanks2024.find(r => r.rank === "이병")!.monthlySalary,
+      일병: militaryRanks2024.find(r => r.rank === "일병")!.monthlySalary,
+      상병: militaryRanks2024.find(r => r.rank === "상병")!.monthlySalary,
+      병장: militaryRanks2024.find(r => r.rank === "병장")!.monthlySalary
+    };
+    
+    const salary2025 = {
+      이병: militaryRanks2025.find(r => r.rank === "이병")!.monthlySalary,
+      일병: militaryRanks2025.find(r => r.rank === "일병")!.monthlySalary,
+      상병: militaryRanks2025.find(r => r.rank === "상병")!.monthlySalary,
+      병장: militaryRanks2025.find(r => r.rank === "병장")!.monthlySalary
+    };
+    
+    // 계급별 저축액 계산을 위한 변수들
+    let savingsByRank = {
+      이병: 0,
+      일병: 0,
+      상병: 0,
+      병장: 0
+    };
+    
+    // 월별 계산 데이터를 담을 배열
+    const monthlyData = [];
+    
+    if (startYear >= 2025) {
       // 2025년 이상 입대자는 모든 월에 동일 금액 적용
-      const monthlyAmount = inputData.monthlySavings * 10000;
+      const monthlyAmount = Math.min(inputData.monthlySavings * 10000, deposit2025Max);
       totalDeposit = monthlyAmount * inputData.serviceMonths;
       
-      // 월급에서 적금 납입액을 제외한 나머지 금액 계산
-      for (const salaryInfo of salaries) {
-        const depositAmount = monthlyAmount;
-        const remainingAmount = salaryInfo.salary - depositAmount;
-        if (remainingAmount > 0) {
-          // 나머지 금액도 모두 저축한다고 가정 (inputData.remainingSavingsRate에 따라 일부만 저축 가능)
-          totalRemaining += remainingAmount * (inputData.remainingSavingsRate / 100);
-        }
-      }
+      // 각 계급별 남는 금액 계산
+      const remainingByRank = {
+        이병: salary2025.이병 - monthlyAmount,
+        일병: salary2025.일병 - monthlyAmount,
+        상병: salary2025.상병 - monthlyAmount,
+        병장: salary2025.병장 - monthlyAmount
+      };
+      
+      // 계급별 저축액 계산 (남는 금액 * 개월 수)
+      savingsByRank.이병 = remainingByRank.이병 * rankMonths.이병;
+      savingsByRank.일병 = remainingByRank.일병 * rankMonths.일병;
+      savingsByRank.상병 = remainingByRank.상병 * rankMonths.상병;
+      savingsByRank.병장 = remainingByRank.병장 * rankMonths.병장;
+      
+      totalRemaining = savingsByRank.이병 + savingsByRank.일병 + savingsByRank.상병 + savingsByRank.병장;
     } else {
-      // 2024년 입대자는 각 연도별로 다른 납입액 적용
-      // 입대 월과 복무 기간을 바탕으로 2024년에 몇 개월, 2025년에 몇 개월 복무하는지 계산
-      const startMonth = parseInt(enlistmentMonth);
-      const startYear = parseInt(enlistmentYear);
-      let months2024 = 0;
-      let months2025 = 0;
+      // 2024년 입대자 - 월별 계산 방식으로 변경
       
-      // 여기서는 납입액 계산을 위해 연도별 개월 수를 계산
+      // 입대 월과 복무 기간을 바탕으로 월별 데이터 계산
+      let currentYear = startYear;
+      let currentMonth = startMonth;
+      let monthsServed = 0; // 복무 개월 수
+      
+      // 각 월별로 계산
       for (let i = 0; i < inputData.serviceMonths; i++) {
-        const currentYear = startYear + Math.floor((startMonth + i - 1) / 12);
-        
-        if (currentYear < 2025) {
-          months2024++;
+        // 현재 개월 수에 따른 계급 결정
+        let currentRank;
+        if (monthsServed < rankMonths.이병) {
+          currentRank = "이병";
+        } else if (monthsServed < rankMonths.이병 + rankMonths.일병) {
+          currentRank = "일병";
+        } else if (monthsServed < rankMonths.이병 + rankMonths.일병 + rankMonths.상병) {
+          currentRank = "상병";
         } else {
-          months2025++;
-        }
-      }
-      
-      // 2024년과 2025년 각각의 납입액 계산
-      const deposit2024 = (inputData.monthlySavings2024 || 40) * 10000 * months2024;
-      const deposit2025 = (inputData.monthlySavings2025 || 55) * 10000 * months2025;
-      
-      totalDeposit = deposit2024 + deposit2025;
-      
-      // 월급에서 적금 납입액을 제외한 나머지 금액 계산
-      for (const salaryInfo of salaries) {
-        let depositAmount = 0;
-        if (salaryInfo.year >= 2025) {
-          depositAmount = (inputData.monthlySavings2025 || 55) * 10000;
-        } else {
-          depositAmount = (inputData.monthlySavings2024 || 40) * 10000;
+          currentRank = "병장";
         }
         
-        const remainingAmount = salaryInfo.salary - depositAmount;
-        if (remainingAmount > 0) {
-          // 나머지 금액도 모두 저축한다고 가정 (inputData.remainingSavingsRate에 따라 일부만 저축 가능)
-          totalRemaining += remainingAmount * (inputData.remainingSavingsRate / 100);
+        // 연도에 따른 월급과 적금 한도 설정
+        const currentSalary = currentYear < 2025 
+          ? salary2024[currentRank as keyof typeof salary2024] 
+          : salary2025[currentRank as keyof typeof salary2025];
+        
+        const depositLimit = currentYear < 2025 ? deposit2024Max : deposit2025Max;
+        const depositAmount = currentYear < 2025 
+          ? Math.min((inputData.monthlySavings2024 || 40) * 10000, depositLimit)
+          : Math.min((inputData.monthlySavings2025 || 55) * 10000, depositLimit);
+        
+        // 남는 금액과 추가 저축액 계산
+        const remainingAmount = currentSalary - depositAmount;
+        const savingsAmount = remainingAmount;
+        
+        // 월별 데이터 저장
+        monthlyData.push({
+          year: currentYear,
+          month: currentMonth,
+          rank: currentRank,
+          salary: currentSalary,
+          deposit: depositAmount,
+          remaining: remainingAmount,
+          savings: savingsAmount
+        });
+        
+        // 총액에 추가
+        totalDeposit += depositAmount;
+        
+        // 계급별 저축액 누적
+        savingsByRank[currentRank as keyof typeof savingsByRank] += savingsAmount;
+        totalRemaining += savingsAmount;
+        
+        // 다음 달로 이동
+        currentMonth++;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
         }
+        
+        // 복무 개월 수 증가
+        monthsServed++;
       }
     }
     
-    // 단리 방식으로 이자 계산 - 사용자가 설정한 통합 금리 사용
-    const baseInterest = totalDeposit * (inputData.interestRate / 100) * (inputData.serviceMonths / 12);
+    // 월 적금 방식으로 이자 계산 - 사용자가 설정한 통합 금리 사용
+    // 월별로 납입하는 적금의 이자 계산식: (원금 x 이율 x (개월수 + 1)) / 24
+    const baseInterest = (totalDeposit * (inputData.interestRate / 100) * (inputData.serviceMonths + 1)) / 24;
     
     // 정부 매칭 지원금 (전체 납입액에 대해 1:1 매칭)
     const governmentMatch = inputData.governmentMatch ? totalDeposit : 0;
+    
+    // 연도별 통계 (디버깅 및 UI 표시용)
+    const yearStats = {
+      2024: { deposit: 0, savings: 0, months: 0 },
+      2025: { deposit: 0, savings: 0, months: 0 },
+      2026: { deposit: 0, savings: 0, months: 0 }
+    };
+    
+    // 월별 데이터로부터 연도별 통계 집계 (월별 방식으로 계산한 경우에만)
+    if (monthlyData.length > 0) {
+      monthlyData.forEach(month => {
+        // 연도별 통계
+        const yearKey = month.year as keyof typeof yearStats;
+        if (yearStats[yearKey]) {
+          yearStats[yearKey].deposit += month.deposit;
+          yearStats[yearKey].savings += month.savings;
+          yearStats[yearKey].months++;
+        }
+      });
+      
+      // 2024년 12월과 2025년 1월 비교 계산 (사용자 요청에 따라)
+      // 복무 기간이 2024년 12월과 2025년 1월을 모두 포함하는 경우에만 계산
+      const dec2024Data = monthlyData.find(m => m.year === 2024 && m.month === 12);
+      const jan2025Data = monthlyData.find(m => m.year === 2025 && m.month === 1);
+      
+      if (dec2024Data && jan2025Data) {
+        console.log('2024년 12월 vs 2025년 1월 비교:', {
+          '2024년 12월 계급': dec2024Data.rank,
+          '2024년 12월 월급': Math.round(dec2024Data.salary / 10000) + '만원',
+          '2024년 12월 적금': Math.round(dec2024Data.deposit / 10000) + '만원',
+          '2024년 12월 남는 금액': Math.round(dec2024Data.remaining / 10000) + '만원',
+          '2024년 12월 저축액': Math.round(dec2024Data.savings / 10000) + '만원',
+          '2025년 1월 계급': jan2025Data.rank,
+          '2025년 1월 월급': Math.round(jan2025Data.salary / 10000) + '만원',
+          '2025년 1월 적금': Math.round(jan2025Data.deposit / 10000) + '만원',
+          '2025년 1월 남는 금액': Math.round(jan2025Data.remaining / 10000) + '만원',
+          '2025년 1월 저축액': Math.round(jan2025Data.savings / 10000) + '만원',
+          '저축액 차이': Math.round((dec2024Data.savings - jan2025Data.savings) / 10000) + '만원'
+        });
+      }
+    }
+    
     
     // 총 수령액 (장병내일준비적금 + 나머지 저축금액)
     const total = totalDeposit + baseInterest + governmentMatch + totalRemaining;
@@ -443,6 +544,11 @@ export default function MoneyCalculator() {
         additionalInterest: 0, // 추가 이자는 없음 (통합 금리로 계산)
         governmentMatch,
         remainingSavings: totalRemaining
+      },
+      // 추가 통계 데이터 (필요시 UI에서 활용 가능)
+      stats: {
+        monthlyData,
+        yearStats
       }
     };
   }, [
@@ -452,10 +558,9 @@ export default function MoneyCalculator() {
     inputData.serviceMonths,
     inputData.interestRate,
     inputData.governmentMatch,
-    inputData.remainingSavingsRate,
     enlistmentMonth,
     enlistmentYear,
-    calculateSalaryByRank
+    militaryType
   ]);
   
   // 계산 결과
@@ -493,13 +598,13 @@ export default function MoneyCalculator() {
                       value={enlistmentYear}
                       onValueChange={handleEnlistmentYearChange}
                     >
-                      <SelectTrigger id="calculatorEnlistmentYear">
+                      <SelectTrigger id="calculatorEnlistmentYear" className="w-full bg-white border border-gray-200 rounded-lg">
                         <SelectValue placeholder="입대 연도 선택" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2024">2024년</SelectItem>
-                        <SelectItem value="2025">2025년</SelectItem>
-                        <SelectItem value="2026">2026년</SelectItem>
+                      <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
+                        <SelectItem value="2024" className="cursor-pointer hover:bg-blue-50">2024년</SelectItem>
+                        <SelectItem value="2025" className="cursor-pointer hover:bg-blue-50">2025년</SelectItem>
+                        <SelectItem value="2026" className="cursor-pointer hover:bg-blue-50">2026년</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -513,12 +618,12 @@ export default function MoneyCalculator() {
                       value={enlistmentMonth}
                       onValueChange={handleEnlistmentMonthChange}
                     >
-                      <SelectTrigger id="calculatorEnlistmentMonth">
+                      <SelectTrigger id="calculatorEnlistmentMonth" className="w-full bg-white border border-gray-200 rounded-lg">
                         <SelectValue placeholder="입대 월 선택" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
                         {enlistmentMonthOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value} className="cursor-pointer hover:bg-blue-50">
                             {option.label}
                           </SelectItem>
                         ))}
@@ -535,13 +640,13 @@ export default function MoneyCalculator() {
                       value={militaryType}
                       onValueChange={handleMilitaryTypeChange}
                     >
-                      <SelectTrigger id="calculatorMilitaryType">
+                      <SelectTrigger id="calculatorMilitaryType" className="w-full bg-white border border-gray-200 rounded-lg">
                         <SelectValue placeholder="군종 선택" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="육군/해병대">육군/해병대 (18개월)</SelectItem>
-                        <SelectItem value="해군">해군 (20개월)</SelectItem>
-                        <SelectItem value="공군">공군 (21개월)</SelectItem>
+                      <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
+                        <SelectItem value="육군/해병대" className="cursor-pointer hover:bg-blue-50">육군/해병대 (18개월)</SelectItem>
+                        <SelectItem value="해군" className="cursor-pointer hover:bg-blue-50">해군 (20개월)</SelectItem>
+                        <SelectItem value="공군" className="cursor-pointer hover:bg-blue-50">공군 (21개월)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -725,12 +830,12 @@ export default function MoneyCalculator() {
                     value={inputData.interestRate.toFixed(1)}
                     onValueChange={handleInterestRateChange}
                   >
-                    <SelectTrigger id="interestRate">
+                    <SelectTrigger id="interestRate" className="w-full bg-white border border-gray-200 rounded-lg">
                       <SelectValue placeholder="금리 선택" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200 max-h-[200px] overflow-y-auto">
                       {Array.from({ length: 31 }, (_, i) => (5 + i * 0.1).toFixed(1)).map((rate) => (
-                        <SelectItem key={rate} value={rate}>
+                        <SelectItem key={rate} value={rate} className="cursor-pointer hover:bg-blue-50">
                           {rate}%
                         </SelectItem>
                       ))}
@@ -851,6 +956,10 @@ export default function MoneyCalculator() {
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-sm text-gray-500">
                     * 실제 수령액은 금리 변동, 납입 일정, 정부 정책 등에 따라 달라질 수 있습니다.
+                    <br />
+                    {(militaryType === "육군" || militaryType === "해병") && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
+                    * {militaryType === "해군" && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
+                    {militaryType === "공군" && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
                   </p>
                 </div>
               </CardContent>
