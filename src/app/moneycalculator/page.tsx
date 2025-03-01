@@ -27,7 +27,6 @@ interface SavingsInputData {
   interestRate: number;            // 총 금리 (기본금리+우대금리)
   governmentMatch: boolean;        // 정부 매칭 지원금
   isYear2025: boolean;             // 2025년 이후 납입 여부 (한도 55만원)
-  taxExemption: boolean;           // 이자소득세 면제 혜택 적용 여부
   selectedBank: string;            // 선택한 은행
   militaryRank?: string;           // 군 계급 (선택사항)
   savingsRatio?: number;           // 월급 대비 저축 비율 (%)
@@ -41,7 +40,6 @@ interface CalculationBreakdown {
   totalDeposit: number;           // 총 납입액
   baseInterest: number;           // 기본 이자
   additionalInterest: number;     // 추가 이자
-  taxSavings: number;             // 세금 절감액
   governmentMatch: number;        // 정부 매칭 지원금
 }
 
@@ -160,18 +158,14 @@ const bankRates: BankInterestRate[] = [
   }
 ];
 
-// 세율 상수
-const TAX_RATE = 0.154; // 이자소득세 15.4%
-
 export default function MoneyCalculator() {
   // 초기 입력값 설정
   const initialInputData: SavingsInputData = {
-    monthlySavings: 40,          // 월 납입액 (만원)
+    monthlySavings: 55,          // 월 납입액 (만원) - 2025년 기준 최대 55만원으로 변경
     serviceMonths: 18,           // 복무 개월 수 (기본 육군)
-    interestRate: 6.0,           // 총 금리 (기본값 6.0%)
+    interestRate: 5.0,           // 총 금리 (기본값 5.0%)
     governmentMatch: true,       // 정부 매칭 지원금 (항상 true로 고정)
     isYear2025: true,            // 2025년 이후 기준 (기본값)
-    taxExemption: true,          // 이자소득세 면제 (항상 true로 고정)
     selectedBank: "국민은행",     // 기본 선택 은행 (남겨두지만 UI에서는 제거)
     savingsRatio: 30,            // 월급 대비 저축 비율 (기본 30%)
     monthlySavings2024: 40,      // 2024년 월 납입액 (기본 40만원)
@@ -183,9 +177,9 @@ export default function MoneyCalculator() {
   const [inputData, setInputData] = useState<SavingsInputData>(initialInputData);
   
   // 입대월 상태
-  const [enlistmentMonth, setEnlistmentMonth] = useState("1");
+  const [enlistmentMonth, setEnlistmentMonth] = useState("6");
   // 입대연도 상태
-  const [enlistmentYear, setEnlistmentYear] = useState("2024");
+  const [enlistmentYear, setEnlistmentYear] = useState("2025");
   // 군 종류 상태
   const [militaryType, setMilitaryType] = useState("육군/해병대");
   
@@ -215,7 +209,7 @@ export default function MoneyCalculator() {
   
   // 기본 금리 변경 핸들러 (통합 금리로 변경)
   const handleInterestRateChange = (value: string) => {
-    const rate = Number(value);
+    const rate = parseFloat(value);
     if (!isNaN(rate) && rate >= 0) {
       setInputData({
         ...inputData,
@@ -445,21 +439,17 @@ export default function MoneyCalculator() {
     // 단리 방식으로 이자 계산 - 사용자가 설정한 통합 금리 사용
     const totalInterest = totalDeposit * (inputData.interestRate / 100) * (inputData.serviceMonths / 12);
     
-    // 이자소득세 계산 (비과세 혜택 적용 여부에 따라)
-    const taxSavings = inputData.taxExemption ? totalInterest * TAX_RATE : 0;
-    
     // 정부 매칭 지원금 (전체 납입액에 대해 1:1 매칭)
     const governmentMatch = inputData.governmentMatch ? totalDeposit : 0;
     
     // 총 수령액 (장병내일준비적금 + 나머지 저축금액)
-    const total = totalDeposit + totalInterest + taxSavings + governmentMatch + totalRemaining;
+    const total = totalDeposit + totalInterest + governmentMatch + totalRemaining;
     
     // 항목별 내역 (통합 금리 기준 변경)
     const breakdown = {
       totalDeposit,
       baseInterest: totalInterest,
       additionalInterest: 0,  // 통합 금리에 이미 포함되어 있으므로 0으로 설정
-      taxSavings,
       governmentMatch,
       remainingSavings: totalRemaining
     };
@@ -469,6 +459,14 @@ export default function MoneyCalculator() {
   
   // 계산 결과
   const result = calculateTotal();
+  
+  // 금리 정보 표시 상태 관리
+  const [showRateInfo, setShowRateInfo] = useState(false);
+  
+  // 금리 정보 토글 핸들러
+  const toggleRateInfo = () => {
+    setShowRateInfo(!showRateInfo);
+  };
   
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
@@ -483,334 +481,386 @@ export default function MoneyCalculator() {
           <p className="text-gray-600">월 납입액, 복무기간, 혜택 등을 입력하여 만기 수령액을 계산해보세요.</p>
         </div>
         
-        <Tabs defaultValue="calculator" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="calculator">계산기</TabsTrigger>
-            <TabsTrigger value="comparison">은행별 비교</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="calculator">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* 입력 폼 */}
-              <div className="lg:col-span-2">
-                <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
-                  <CardHeader className="border-b border-gray-100 p-6">
-                    <CardTitle>계산 정보 입력</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6">
-                    {/* 입대 정보 */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* 입대 연도 선택 */}
-                      <div className="space-y-2">
-                        <Label htmlFor="calculatorEnlistmentYear" className="text-base font-medium text-gray-700 block">
-                          입대 연도
-                        </Label>
-                        <Select
-                          value={enlistmentYear}
-                          onValueChange={handleEnlistmentYearChange}
-                        >
-                          <SelectTrigger id="calculatorEnlistmentYear">
-                            <SelectValue placeholder="입대 연도 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2023">2023년</SelectItem>
-                            <SelectItem value="2024">2024년</SelectItem>
-                            <SelectItem value="2025">2025년</SelectItem>
-                            <SelectItem value="2026">2026년</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* 입력 폼 */}
+          <div className="lg:col-span-2">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <CardContent className="p-6 space-y-6">
+                {/* 입대 정보 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* 입대 연도 선택 */}
+                  <div className="space-y-2">
+                    <Label htmlFor="calculatorEnlistmentYear" className="text-base font-medium text-gray-700 block">
+                      입대 연도
+                    </Label>
+                    <Select
+                      value={enlistmentYear}
+                      onValueChange={handleEnlistmentYearChange}
+                    >
+                      <SelectTrigger id="calculatorEnlistmentYear">
+                        <SelectValue placeholder="입대 연도 선택" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2024">2024년</SelectItem>
+                        <SelectItem value="2025">2025년</SelectItem>
+                        <SelectItem value="2026">2026년</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                      {/* 입대 월 선택 */}
-                      <div className="space-y-2">
-                        <Label htmlFor="calculatorEnlistmentMonth" className="text-base font-medium text-gray-700 block">
-                          입대 월
-                        </Label>
-                        <Select
-                          value={enlistmentMonth}
-                          onValueChange={handleEnlistmentMonthChange}
-                        >
-                          <SelectTrigger id="calculatorEnlistmentMonth">
-                            <SelectValue placeholder="입대 월 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {enlistmentMonthOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  {/* 입대 월 선택 */}
+                  <div className="space-y-2">
+                    <Label htmlFor="calculatorEnlistmentMonth" className="text-base font-medium text-gray-700 block">
+                      입대 월
+                    </Label>
+                    <Select
+                      value={enlistmentMonth}
+                      onValueChange={handleEnlistmentMonthChange}
+                    >
+                      <SelectTrigger id="calculatorEnlistmentMonth">
+                        <SelectValue placeholder="입대 월 선택" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {enlistmentMonthOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                      {/* 군종 선택 */}
-                      <div className="space-y-2">
-                        <Label htmlFor="calculatorMilitaryType" className="text-base font-medium text-gray-700 block">
-                          군종
+                  {/* 군종 선택 */}
+                  <div className="space-y-2">
+                    <Label htmlFor="calculatorMilitaryType" className="text-base font-medium text-gray-700 block">
+                      군종
+                    </Label>
+                    <Select
+                      value={militaryType}
+                      onValueChange={handleMilitaryTypeChange}
+                    >
+                      <SelectTrigger id="calculatorMilitaryType">
+                        <SelectValue placeholder="군종 선택" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="육군/해병대">육군/해병대 (18개월)</SelectItem>
+                        <SelectItem value="해군">해군 (20개월)</SelectItem>
+                        <SelectItem value="공군">공군 (21개월)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                {/* 월 납입액 입력 섹션 - 입대 연도에 따라 달라짐 */}
+                {parseInt(enlistmentYear) >= 2025 ? (
+                  // 2025년 이상 입대자용 단일 슬라이더
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="monthlySavings" className="text-base font-medium text-gray-700">
+                        월 납입액
+                      </Label>
+                      <span className="text-lg font-semibold text-blue-600">{inputData.monthlySavings}만원</span>
+                    </div>
+                    <div className="relative pt-1">
+                      <input 
+                        type="range"
+                        id="monthlySavings"
+                        value={inputData.monthlySavings}
+                        min={1}
+                        max={55}
+                        step={1}
+                        onChange={(e) => handleMonthlySavingsChange(e.target.value)}
+                        className="w-full appearance-none h-1 rounded-full bg-gray-200 focus:outline-none focus:ring-0 focus:shadow-none"
+                        style={{
+                          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(inputData.monthlySavings / 55) * 100}%, #e5e7eb ${(inputData.monthlySavings / 55) * 100}%, #e5e7eb 100%)`
+                        }}
+                      />
+                      <div className="absolute left-0 right-0 -bottom-6 flex justify-between text-xs text-gray-500">
+                        <span>1만원</span>
+                        <span>55만원</span>
+                      </div>
+                    </div>
+                    <style jsx>{`
+                      input[type=range]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid #3b82f6;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        cursor: pointer;
+                        transition: all 0.15s ease;
+                      }
+                      input[type=range]::-webkit-slider-thumb:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                      }
+                      input[type=range]::-moz-range-thumb {
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid #3b82f6;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        cursor: pointer;
+                        transition: all 0.15s ease;
+                      }
+                      input[type=range]::-moz-range-thumb:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                      }
+                    `}</style>
+                  </div>
+                ) : (
+                  // 2024년 입대자용 두 개의 슬라이더
+                  <div className="space-y-8">
+                    {/* 2024년용 슬라이더 */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="monthlySavings2024" className="text-base font-medium text-gray-700">
+                          2024년 월 납입액
                         </Label>
-                        <Select
-                          value={militaryType}
-                          onValueChange={handleMilitaryTypeChange}
-                        >
-                          <SelectTrigger id="calculatorMilitaryType">
-                            <SelectValue placeholder="군종 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="육군/해병대">육군/해병대 (18개월)</SelectItem>
-                            <SelectItem value="해군">해군 (20개월)</SelectItem>
-                            <SelectItem value="공군">공군 (21개월)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <span className="text-lg font-semibold text-blue-600">{inputData.monthlySavings2024}만원</span>
+                      </div>
+                      <div className="relative pt-1">
+                        <input 
+                          type="range"
+                          id="monthlySavings2024"
+                          value={inputData.monthlySavings2024 || 40}
+                          min={1}
+                          max={40}
+                          step={1}
+                          onChange={(e) => handleMonthlySavings2024Change(e.target.value)}
+                          className="w-full appearance-none h-1 rounded-full bg-gray-200 focus:outline-none focus:ring-0 focus:shadow-none"
+                          style={{
+                            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((inputData.monthlySavings2024 || 40) / 40) * 100}%, #e5e7eb ${((inputData.monthlySavings2024 || 40) / 40) * 100}%, #e5e7eb 100%)`
+                          }}
+                        />
+                        <div className="absolute left-0 right-0 -bottom-6 flex justify-between text-xs text-gray-500">
+                          <span>1만원</span>
+                          <span>40만원</span>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* 월 납입액 입력 섹션 - 입대 연도에 따라 달라짐 */}
-                    {parseInt(enlistmentYear) >= 2025 ? (
-                      // 2025년 이상 입대자용 단일 슬라이더
-                      <div className="space-y-3">
-                        <Label htmlFor="monthlySavings" className="text-base font-medium text-green-700 block">
-                          월 납입액: {inputData.monthlySavings}만원 (최대 55만원)
+                    {/* 2025년용 슬라이더 */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="monthlySavings2025" className="text-base font-medium text-gray-700">
+                          2025년 월 납입액
                         </Label>
+                        <span className="text-lg font-semibold text-blue-600">{inputData.monthlySavings2025}만원</span>
+                      </div>
+                      <div className="relative pt-1">
                         <input 
                           type="range"
-                          id="monthlySavings"
-                          value={inputData.monthlySavings}
+                          id="monthlySavings2025"
+                          value={inputData.monthlySavings2025 || 55}
                           min={1}
                           max={55}
                           step={1}
-                          onChange={(e) => handleMonthlySavingsChange(e.target.value)}
-                          className="w-full"
+                          onChange={(e) => handleMonthlySavings2025Change(e.target.value)}
+                          className="w-full appearance-none h-1 rounded-full bg-gray-200 focus:outline-none focus:ring-0 focus:shadow-none"
+                          style={{
+                            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((inputData.monthlySavings2025 || 55) / 55) * 100}%, #e5e7eb ${((inputData.monthlySavings2025 || 55) / 55) * 100}%, #e5e7eb 100%)`
+                          }}
                         />
-                        <div className="flex justify-between text-sm text-gray-500">
+                        <div className="absolute left-0 right-0 -bottom-6 flex justify-between text-xs text-gray-500">
                           <span>1만원</span>
                           <span>55만원</span>
                         </div>
                       </div>
-                    ) : (
-                      // 2024년 입대자용 두 개의 슬라이더
-                      <div className="space-y-6">
-                        {/* 2024년용 슬라이더 */}
-                        <div className="space-y-3">
-                          <Label htmlFor="monthlySavings2024" className="text-base font-medium text-green-700 block">
-                            2024년 월 납입액: {inputData.monthlySavings2024}만원 (최대 40만원)
-                          </Label>
-                          <input 
-                            type="range"
-                            id="monthlySavings2024"
-                            value={inputData.monthlySavings2024 || 40}
-                            min={1}
-                            max={40}
-                            step={1}
-                            onChange={(e) => handleMonthlySavings2024Change(e.target.value)}
-                            className="w-full"
-                          />
-                          <div className="flex justify-between text-sm text-gray-500">
-                            <span>1만원</span>
-                            <span>40만원</span>
-                          </div>
-                        </div>
-                        
-                        {/* 2025년용 슬라이더 */}
-                        <div className="space-y-3">
-                          <Label htmlFor="monthlySavings2025" className="text-base font-medium text-green-700 block">
-                            2025년 월 납입액: {inputData.monthlySavings2025}만원 (최대 55만원)
-                          </Label>
-                          <input 
-                            type="range"
-                            id="monthlySavings2025"
-                            value={inputData.monthlySavings2025 || 55}
-                            min={1}
-                            max={55}
-                            step={1}
-                            onChange={(e) => handleMonthlySavings2025Change(e.target.value)}
-                            className="w-full"
-                          />
-                          <div className="flex justify-between text-sm text-gray-500">
-                            <span>1만원</span>
-                            <span>55만원</span>
-                          </div>
-                        </div>
+                    </div>
+                    <style jsx>{`
+                      input[type=range]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid #3b82f6;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        cursor: pointer;
+                        transition: all 0.15s ease;
+                      }
+                      input[type=range]::-webkit-slider-thumb:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                      }
+                      input[type=range]::-moz-range-thumb {
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid #3b82f6;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        cursor: pointer;
+                        transition: all 0.15s ease;
+                      }
+                      input[type=range]::-moz-range-thumb:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                      }
+                    `}</style>
+                  </div>
+                )}
+                
+                {/* 월 납입액 설명 */}
+                <div className="space-y-1">
+                  <p className="text-sm text-gray-500 italic">
+                    ※ 2025년부터는 월 납입액 한도가 55만원으로 상향됩니다. 2024년에는 40만원까지 납입 가능합니다.
+                  </p>
+                  {parseInt(enlistmentYear) === 2024 && (
+                    <p className="text-sm text-gray-500 italic font-medium">
+                      ※ 2024년 입대자는 복무 기간 중 연도별로 다른 납입액을 설정할 수 있습니다.
+                    </p>
+                  )}
+                </div>
+                
+                {/* 금리 설정 */}
+                <div className="space-y-2">
+                  <Label htmlFor="interestRate" className="text-base font-medium text-gray-700 block">
+                    금리 설정
+                  </Label>
+                  <Select
+                    value={inputData.interestRate.toFixed(1)}
+                    onValueChange={handleInterestRateChange}
+                  >
+                    <SelectTrigger id="interestRate">
+                      <SelectValue placeholder="금리 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 31 }, (_, i) => (5 + i * 0.1).toFixed(1)).map((rate) => (
+                        <SelectItem key={rate} value={rate}>
+                          {rate}%
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {/* 금리 확인하기 토글 버튼 */}
+                  <div className="mt-2 text-left">
+                    <button 
+                      onClick={toggleRateInfo}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline inline-flex items-center"
+                    >
+                      <span>은행별 금리 확인하기</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ml-1 transition-transform ${showRateInfo ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {/* 은행별 금리 정보 (토글) */}
+                  {showRateInfo && (
+                    <div className="mt-4 border border-blue-100 rounded-lg overflow-hidden transition-all duration-300 ease-in-out">
+                      <div className="bg-blue-50 px-4 py-2 border-b border-blue-100">
+                        <h3 className="font-medium text-blue-700">은행별 금리 비교</h3>
                       </div>
-                    )}
-                    
-                    {/* 월 납입액 설명 */}
-                    <div className="space-y-1">
-                      <p className="text-sm text-gray-500 italic">
-                        ※ 2025년부터는 월 납입액 한도가 55만원으로 상향됩니다. 2024년에는 40만원까지 납입 가능합니다.
-                      </p>
-                      {parseInt(enlistmentYear) === 2024 && (
-                        <p className="text-sm text-gray-500 italic font-medium">
-                          ※ 2024년 입대자는 복무 기간 중 연도별로 다른 납입액을 설정할 수 있습니다.
-                        </p>
-                      )}
-                    </div>
-                    
-                    {/* 금리 설정 */}
-                    <div className="space-y-2">
-                      <Label htmlFor="interestRate" className="text-base font-medium text-gray-700 block">
-                        금리 설정 (현재: {inputData.interestRate}%)
-                      </Label>
-                      <Select
-                        value={inputData.interestRate.toString()}
-                        onValueChange={handleInterestRateChange}
-                      >
-                        <SelectTrigger id="interestRate">
-                          <SelectValue placeholder="금리 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 31 }, (_, i) => (5 + i * 0.1).toFixed(1)).map((rate) => (
-                            <SelectItem key={rate} value={rate}>
-                              {rate}%
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              {/* 결과 표시 */}
-              <div className="lg:col-span-1">
-                <Card className="bg-white rounded-xl shadow-sm border border-gray-100 sticky top-4">
-                  <CardHeader className="border-b border-gray-100 p-6">
-                    <CardTitle>예상 수령액</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="mb-6">
-                      <p className="text-4xl font-bold text-green-700 text-center">
-                        {Math.round(result.total).toLocaleString()}원
-                      </p>
-                      <p className="text-sm text-gray-500 text-center mt-1">
-                        예상 총 수령액
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-3 pt-3 border-t border-gray-100">
-                      <h3 className="font-medium text-green-700">상세 내역</h3>
-                      
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">총 납입액</span>
-                        <span className="font-medium">{Math.round(result.breakdown.totalDeposit).toLocaleString()}원</span>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">이자</span>
-                        <span className="font-medium">{Math.round(result.breakdown.baseInterest).toLocaleString()}원</span>
-                      </div>
-                      
-                      {inputData.taxExemption && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">세금 절감액</span>
-                          <span className="font-medium">{Math.round(result.breakdown.taxSavings).toLocaleString()}원</span>
-                        </div>
-                      )}
-                      
-                      {inputData.governmentMatch && result.breakdown.governmentMatch > 0 && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">정부 매칭 지원금</span>
-                          <span className="font-medium">{Math.round(result.breakdown.governmentMatch).toLocaleString()}원</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">월급 나머지 저축액</span>
-                        <span className="font-medium">{Math.round(result.breakdown.remainingSavings).toLocaleString()}원</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6 pt-4 border-t border-gray-100">
-                      <p className="text-sm text-gray-500">
-                        * 실제 수령액은 금리 변동, 납입 일정, 정부 정책 등에 따라 달라질 수 있습니다.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="comparison">
-            <Card>
-              <CardHeader>
-                <CardTitle>은행별 장병내일준비적금 비교</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>은행명</TableHead>
-                      <TableHead>기본금리</TableHead>
-                      <TableHead>우대금리</TableHead>
-                      <TableHead>총 금리</TableHead>
-                      <TableHead>특별혜택</TableHead>
-                      <TableHead>상세정보</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {bankRates.map((bank) => (
-                      <TableRow key={bank.bankName}>
-                        <TableCell className="font-medium">{bank.bankName}</TableCell>
-                        <TableCell>{bank.baseRate}%</TableCell>
-                        <TableCell>{bank.additionalRate}%</TableCell>
-                        <TableCell className="font-bold">{bank.totalRate}%</TableCell>
-                        <TableCell>{bank.specialBenefits}</TableCell>
-                        <TableCell>
-                          <a 
-                            href={bank.officialLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
+                      <div className="p-4 bg-white max-h-80 overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-2 py-2 text-left font-medium text-gray-700">은행명</th>
+                              <th className="px-2 py-2 text-center font-medium text-gray-700">기본금리</th>
+                              <th className="px-2 py-2 text-center font-medium text-gray-700">우대금리</th>
+                              <th className="px-2 py-2 text-center font-medium text-gray-700">총 금리</th>
+                              <th className="px-2 py-2 text-left font-medium text-gray-700">특별혜택</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {bankRates.map((bank) => (
+                              <tr key={bank.bankName} className="border-t border-gray-100">
+                                <td className="px-2 py-2 font-medium">{bank.bankName}</td>
+                                <td className="px-2 py-2 text-center">{bank.baseRate}%</td>
+                                <td className="px-2 py-2 text-center">{bank.additionalRate}%</td>
+                                <td className="px-2 py-2 text-center font-medium text-blue-600">{bank.totalRate}%</td>
+                                <td className="px-2 py-2">{bank.specialBenefits}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="mt-3 text-right">
+                          <button 
+                            onClick={() => setShowRateInfo(false)}
+                            className="text-sm text-gray-500 hover:text-gray-700"
                           >
-                            바로가기
-                          </a>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                            닫기
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
-            
-            <div className="mt-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>장병내일준비적금 가입 방법</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p>
-                    장병내일준비적금은 각 은행의 인터넷뱅킹이나 모바일뱅킹 앱을 통해 가입할 수 있습니다. 
-                    가입 시 필요한 서류와 절차는 다음과 같습니다:
+          </div>
+          
+          {/* 결과 표시 */}
+          <div className="lg:col-span-1">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-100 sticky top-4">
+              <CardContent className="p-6">
+                {/* 총 모을 수 있는 금액 - 가장 크게 표시 */}
+                <div className="mb-6 bg-blue-50 p-4 rounded-lg">
+                  <h3 className="text-base font-medium text-blue-700 text-center">총 모을 수 있는 금액</h3>
+                  <p className="text-4xl font-bold text-blue-700 text-center mt-2">
+                    {Math.round(result.total).toLocaleString()}원
+                  </p>
+                  <p className="text-xs text-gray-500 text-center mt-1">
+                    (장병내일준비적금 + 월급 나머지 저축액)
+                  </p>
+                </div>
+                
+                {/* 장병내일준비적금 예상 수령액 */}
+                <div className="mb-6 p-4 border border-green-100 rounded-lg bg-green-50">
+                  <h3 className="font-medium text-green-700 text-center">장병내일준비적금 예상 수령액</h3>
+                  <p className="text-2xl font-bold text-green-700 text-center mt-2">
+                    {Math.round(result.total - result.breakdown.remainingSavings).toLocaleString()}원
                   </p>
                   
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h3 className="text-lg font-medium text-blue-700 mb-2">필요 서류</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                      <li>본인 명의 신분증 (주민등록증, 운전면허증 등)</li>
-                      <li>병적증명서 또는 군복무확인서</li>
-                      <li>가입 은행 계좌 (없을 경우 신규 개설 필요)</li>
-                    </ul>
+                  <div className="space-y-3 pt-3 mt-2 border-t border-green-200">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">총 납입액</span>
+                      <span className="font-medium">{Math.round(result.breakdown.totalDeposit).toLocaleString()}원</span>
+                    </div>
+                    
+                    {inputData.governmentMatch && result.breakdown.governmentMatch > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">정부 매칭 지원금</span>
+                        <span className="font-medium">{Math.round(result.breakdown.governmentMatch).toLocaleString()}원</span>
+                      </div>
+                    )}
+                     
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">이자</span>
+                      <span className="font-medium">{Math.round(result.breakdown.baseInterest).toLocaleString()}원</span>
+                    </div>
                   </div>
-                  
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h3 className="text-lg font-medium text-green-700 mb-2">가입 절차</h3>
-                    <ol className="list-decimal pl-5 space-y-1 text-gray-700">
-                      <li>각 은행 앱 또는 인터넷뱅킹에 로그인</li>
-                      <li>&apos;장병내일준비적금&apos; 또는 &apos;군인적금&apos; 메뉴 선택</li>
-                      <li>본인 정보 및 군 복무 정보 입력</li>
-                      <li>월 납입액 및 자동이체 날짜 설정</li>
-                      <li>약관 동의 후 가입 완료</li>
-                    </ol>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600">
-                    ※ 일부 은행은 모바일앱 가입 시 우대금리를 제공하는 경우가 있으니 가입 전 확인하세요.
+                </div>
+                
+                {/* 추가 저축 가능액 */}
+                <div className="mb-6 p-4 border border-yellow-100 rounded-lg bg-yellow-50">
+                  <h3 className="font-medium text-yellow-700 text-center">추가 저축 가능액</h3>
+                  <p className="text-2xl font-bold text-yellow-700 text-center mt-2">
+                    {Math.round(result.breakdown.remainingSavings).toLocaleString()}원
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  <p className="text-xs text-gray-600 text-center mt-1">
+                    월급에서 적금 납입 후 남은 금액을 저축한 총액
+                  </p>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-500">
+                    * 실제 수령액은 금리 변동, 납입 일정, 정부 정책 등에 따라 달라질 수 있습니다.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
         
         {/* 하단 광고 */}
         <div className="mt-8">
