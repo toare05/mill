@@ -20,9 +20,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "군간부 합격 점수 계산기 | 계산기밀",
-  description: "군간부 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
-  keywords: ["군간부", "합격 점수", "계산기", "병과", "전공", "자격증", "군복무"],
+  title: "공군 점수 | 계산기밀",
+  description: "대한민국 공군 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
+  keywords: ["공군", "점수", "1차 점수", "병과", "전공", "자격증", "군복무"],
   authors: [{ name: "toare", url: "" }],
   creator: "toare",
   publisher: "toare",
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: "군간부 합격 점수 계산기 | 계산기밀",
-    description: "군간부 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
+    title: "공군 점수 | 계산기밀",
+    description: "대한민국 공군 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
     url: "https://allformilitary.site",
     siteName: "계산기밀",
     locale: "ko_KR",
@@ -59,8 +59,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <meta name="msapplication-TileImage" content="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+        <link rel="icon" href="/favicon.ico" />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6559398788369653"
@@ -73,8 +72,8 @@ export default function RootLayout({
             {
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "군간부 합격 점수 계산기 | 계산기밀",
-              "description": "군간부 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
+              "name": "공군 점수",
+              "description": "대한민국 공군 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
               "applicationCategory": "UtilityApplication",
               "offers": {
                 "@type": "Offer",

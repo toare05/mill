@@ -1,6 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+
+// AdSense의 전역 객체를 위한 타입 선언
+declare global {
+  interface Window {
+    adsbygoogle: any[];
+  }
+}
 
 interface GoogleAdsenseProps {
   slot: string;
@@ -17,17 +24,34 @@ export default function GoogleAdsense({
   responsive = true,
   layout,
 }: GoogleAdsenseProps) {
+  const adRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    try {
-      // @ts-expect-error window.adsbygoogle is added by the AdSense script
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error('Adsense error:', err);
+    const loadAd = () => {
+      try {
+        if (window.adsbygoogle && adRef.current) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        }
+      } catch (err) {
+        console.error('AdSense error:', err);
+      }
+    };
+    
+    // Load ad when component mounts
+    loadAd();
+    
+    // Handle case where AdSense script loads after component mounts
+    if (document.querySelector('script[src*="adsbygoogle"]')) {
+      loadAd();
     }
-  }, []);
+    
+    return () => {
+      // Cleanup if needed
+    };
+  }, [slot]);
 
   return (
-    <div className="ad-container">
+    <div className="ad-container" ref={adRef}>
       <ins
         className="adsbygoogle"
         style={style}

@@ -19,6 +19,7 @@ import { MAX_SCORES } from "@/constants/scores";
 import ScoreForm from "@/components/ScoreForm";
 import ScoreResultComponent from "@/components/ScoreResult";
 import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
+import GoogleAdsense from "@/components/GoogleAdsense";
 
 export default function Home() {
   // 초기 사용자 입력 데이터
@@ -146,17 +147,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         {/* 상단 광고 */}
         <div className="mb-8">
-          {/* 
-            구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
-            예: <GoogleAdsense slot="1234567890" /> -> <GoogleAdsense slot="5678901234" />
-          */}
-          {/* 임시 광고 위치 표시 */}
-          <div className="w-full h-[250px] bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-600 font-bold rounded-lg">
-            <div className="text-center">
-              <p>광고가 표시될 위치 (상단)</p>
-              <p className="text-sm mt-2">728x90 또는 반응형 광고</p>
-            </div>
-          </div>
+          <GoogleAdsense slot="1234567890" />
         </div>
 
         <div className="text-center mb-8">
@@ -255,17 +246,7 @@ export default function Home() {
 
         {/* 하단 광고 */}
         <div className="mt-8">
-          {/* 
-            구글 애드센스 대시보드에서 생성한 실제 광고 단위의 슬롯 ID로 교체하세요.
-            예: <GoogleAdsense slot="0987654321" /> -> <GoogleAdsense slot="9876543210" />
-          */}
-          {/* 임시 광고 위치 표시 */}
-          <div className="w-full h-[250px] bg-green-100 border-2 border-green-300 flex items-center justify-center text-green-600 font-bold rounded-lg">
-            <div className="text-center">
-              <p>광고가 표시될 위치 (하단)</p>
-              <p className="text-sm mt-2">728x90 또는 반응형 광고</p>
-            </div>
-          </div>
+          <GoogleAdsense slot="0987654321" />
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
