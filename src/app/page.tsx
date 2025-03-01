@@ -1,260 +1,74 @@
 "use client";
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  AttendanceType, 
-  BonusPointType, 
-  CertificateType, 
-  MajorType, 
-  SoldierType, 
-  SpecialtyType,
-  UserInputData 
-} from "@/types";
-import { calculateScore } from "@/utils/calculateScore";
-import { MAX_SCORES } from "@/constants/scores";
-import ScoreForm from "@/components/ScoreForm";
-import ScoreResultComponent from "@/components/ScoreResult";
-import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import GoogleAdsense from "@/components/GoogleAdsense";
 
 export default function Home() {
-  // 초기 사용자 입력 데이터
-  const initialUserData: UserInputData = {
-    soldierType: "general",
-    certificate: "none",
-    major: "nonMajor",
-    attendance: "absence0",
-    bonusPoints: [],
-    recruitmentMonth: "2025년 6월", // 기본값을 2025년 6월로 설정
-    specialty: "general" // 기본값은 일반(기술)
-  };
-
-  // 사용자 입력 데이터 상태
-  const [userData, setUserData] = useState<UserInputData>(initialUserData);
-  
-  // 점수 계산 결과
-  const scoreResult = calculateScore(userData);
-  
-  // 군인 유형 변경 핸들러
-  const handleSoldierTypeChange = (type: SoldierType) => {
-    let specialty: SpecialtyType = "general";
-    
-    // 군인 유형에 따라 기본 특기 설정
-    if (type === "general") {
-      specialty = "general"; // 일반기술병은 일반기술 하나만 있음
-    } else if (type === "specialized") {
-      specialty = "electronic"; // 전문기술병의 경우 전자계산을 기본값으로
-    }
-    
-    setUserData({
-      ...userData,
-      soldierType: type,
-      certificate: "none",
-      major: "nonMajor",
-      attendance: "absence0",
-      bonusPoints: [],
-      specialty
-    });
-  };
-  
-  // 자격/면허 변경 핸들러
-  const handleCertificateChange = (cert: CertificateType) => {
-    setUserData({
-      ...userData,
-      certificate: cert
-    });
-  };
-  
-  // 전공 변경 핸들러
-  const handleMajorChange = (major: MajorType) => {
-    setUserData({
-      ...userData,
-      major
-    });
-  };
-  
-  // 출결 상황 변경 핸들러
-  const handleAttendanceChange = (attendance: AttendanceType) => {
-    setUserData({
-      ...userData,
-      attendance
-    });
-  };
-  
-  // 가산점 변경 핸들러
-  const handleBonusPointsChange = (bonusPoints: BonusPointType[]) => {
-    setUserData({
-      ...userData,
-      bonusPoints
-    });
-  };
-  
-  // 지원 월 변경 핸들러
-  const handleRecruitmentMonthChange = (month: string) => {
-    setUserData({
-      ...userData,
-      recruitmentMonth: month
-    });
-  };
-  
-  // 특기 변경 핸들러
-  const handleSpecialtyChange = (specialty: SpecialtyType) => {
-    let updatedCertificate = userData.certificate;
-    
-    // 차량운전 특기에서 다른 특기로 변경될 때 운전면허 관련 자격증을 선택한 상태라면 자격증을 'none'으로 변경
-    if (userData.specialty === 'driving' && specialty !== 'driving') {
-      if (
-        userData.certificate === 'largeSpecial' || 
-        userData.certificate === 'type1Manual' || 
-        userData.certificate === 'type2Manual'
-      ) {
-        updatedCertificate = 'none';
-      }
-    }
-    
-    setUserData({
-      ...userData,
-      specialty,
-      certificate: updatedCertificate
-    });
-  };
-  
-  // 특기 옵션 생성
-  const getSpecialtyOptions = () => {
-    if (userData.soldierType === "general") {
-      return [
-        { value: "general" as SpecialtyType, label: "일반기술" }
-      ];
-    } else {
-      return [
-        { value: "electronic" as SpecialtyType, label: "전자계산" },
-        { value: "chemical" as SpecialtyType, label: "화생방" },
-        { value: "medical" as SpecialtyType, label: "의무" },
-        { value: "mechanical" as SpecialtyType, label: "기계" },
-        { value: "driving" as SpecialtyType, label: "차량운전" },
-        { value: "maintenance" as SpecialtyType, label: "차량정비" },
-        { value: "communication" as SpecialtyType, label: "통신전자전기" }
-      ];
-    }
-  };
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* 상단 광고 */}
         <div className="mb-8">
-          <GoogleAdsense slot="1234567890" />
+          <GoogleAdsense slot="9643547680" />
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">공군 지원 1차 점수 계산기</h1>
-          <p className="text-gray-600">자격/면허, 전공, 출결, 가산점을 입력하여 1차 점수를 계산해보세요.</p>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-3">계산기밀</h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            대한민국 군 관련 다양한 계산기를 제공합니다. 
+            공군 지원 점수와 장병내일준비적금 수령액 계산을 도와드립니다.
+          </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 입력 폼 */}
-          <div className="lg:col-span-2">
-            <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <CardHeader className="border-b border-gray-100 p-6">
-                <CardTitle>점수 계산 입력</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                {/* 지원 월 선택 */}
-                <div className="mb-6">
-                  <Label htmlFor="recruitmentMonth" className="text-base font-medium text-blue-700 block mb-3">지원 월 선택</Label>
-                  <Select
-                    value={userData.recruitmentMonth}
-                    onValueChange={handleRecruitmentMonthChange}
-                  >
-                    <SelectTrigger id="recruitmentMonth">
-                      <SelectValue placeholder="지원 월을 선택하세요" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {RECRUITMENT_MONTH_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <Tabs defaultValue="general" onValueChange={(value) => handleSoldierTypeChange(value as SoldierType)}>
-                  <TabsList className="mb-6 w-full">
-                    <TabsTrigger value="general" className="flex-1">일반기술병</TabsTrigger>
-                    <TabsTrigger value="specialized" className="flex-1">전문기술병</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="general">
-                    {/* 일반기술병은 특기 선택 칸 없음 - 자동으로 "일반기술" 특기 선택됨 */}
-                    <ScoreForm
-                      userData={userData}
-                      onCertificateChange={handleCertificateChange}
-                      onMajorChange={handleMajorChange}
-                      onAttendanceChange={handleAttendanceChange}
-                      onBonusPointsChange={handleBonusPointsChange}
-                    />
-                  </TabsContent>
-                  <TabsContent value="specialized">
-                    {/* 특기 선택 (전문기술병) */}
-                    <div className="form-section p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
-                      <Label htmlFor="specialty" className="text-base font-medium text-blue-700 block mb-3">특기 선택</Label>
-                      <Select
-                        value={userData.specialty}
-                        onValueChange={(value) => handleSpecialtyChange(value as SpecialtyType)}
-                      >
-                        <SelectTrigger id="specialty">
-                          <SelectValue placeholder="특기를 선택하세요" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getSpecialtyOptions().map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <ScoreForm
-                      userData={userData}
-                      onCertificateChange={handleCertificateChange}
-                      onMajorChange={handleMajorChange}
-                      onAttendanceChange={handleAttendanceChange}
-                      onBonusPointsChange={handleBonusPointsChange}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* 공군 점수 계산기 카드 */}
+          <Card className="bg-white rounded-xl shadow-md transition-all hover:shadow-lg border border-gray-100">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl font-bold text-blue-700">공군 지원 점수 계산기</CardTitle>
+              <CardDescription>공군 지원을 위한 1차 점수를 계산해보세요</CardDescription>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <p className="text-gray-600">
+                자격/면허, 전공, 출결, 가산점 등을 입력하여 공군 지원 1차 점수를 실시간으로 계산하고, 
+                선발 점수와 비교해볼 수 있습니다.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Link href="/scorecalculator" passHref className="w-full">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  점수 계산하기
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
           
-          {/* 점수 결과 */}
-          <div className="lg:col-span-1">
-            <ScoreResultComponent 
-              scoreResult={scoreResult} 
-              soldierType={userData.soldierType}
-              maxScore={MAX_SCORES[userData.soldierType]}
-              recruitmentMonth={userData.recruitmentMonth}
-              specialty={userData.specialty}
-            />
-          </div>
+          {/* 장병내일준비적금 계산기 카드 */}
+          <Card className="bg-white rounded-xl shadow-md transition-all hover:shadow-lg border border-gray-100">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl font-bold text-green-700">장병내일준비적금 계산기</CardTitle>
+              <CardDescription>군 적금 만기시 예상 수령액을 확인해보세요</CardDescription>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <p className="text-gray-600">
+                매월 적립액, 이자율, 복무기간 등을 입력하여 장병내일준비적금 만기시 
+                받게 될 최종 수령액을 계산할 수 있습니다.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Link href="/moneycalculator" passHref className="w-full">
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  수령액 계산하기
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
         </div>
 
         {/* 하단 광고 */}
-        <div className="mt-8">
-          <GoogleAdsense slot="0987654321" />
-        </div>
-
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>※ 본 계산기는 공군 지원 1차 점수만 계산하며, 면접 점수는 포함되지 않습니다.</p>
-          <p>※ 정확한 점수는 병무청 공식 홈페이지를 참고하시기 바랍니다.</p>
-          <p className="mt-2">
-            <a href="/privacy-policy" className="text-blue-500 hover:underline">개인정보 처리방침</a>
-          </p>
+        <div className="mt-12">
+          <GoogleAdsense slot="1766592881" />
         </div>
       </div>
     </main>
