@@ -857,10 +857,6 @@ export default function MoneyCalculator() {
           </div>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>※ 본 계산기는 참고용이며, 실제 금융상품의 조건과 다를 수 있습니다.</p>
-          <p>※ 정확한 정보는 관련 금융기관 또는 정부 기관의 공식 홈페이지를 참고하시기 바랍니다.</p>
-        </div>
         
         {/* 다른 계산기로 이동하는 링크 */}
         <div className="mt-12 p-6 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
@@ -875,6 +871,10 @@ export default function MoneyCalculator() {
               <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </Link>
+        </div>
+           <div className="mt-8 text-center text-sm text-gray-500">
+          <p>※ 본 계산기는 참고용이며, 실제 금융상품의 조건과 다를 수 있습니다.</p>
+          <p>※ 정확한 정보는 관련 금융기관 또는 정부 기관의 공식 홈페이지를 참고하시기 바랍니다.</p>
         </div>
       </div>
     </main>
