@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 // AdSense의 전역 객체를 위한 타입 선언
 declare global {
   interface Window {
-    adsbygoogle: any[];
+    adsbygoogle: Array<Record<string, unknown>>;
   }
 }
 
