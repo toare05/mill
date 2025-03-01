@@ -538,9 +538,9 @@ export default function MoneyCalculator() {
                         <SelectValue placeholder="군종 선택" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="공군">공군 (21개월)</SelectItem>
                         <SelectItem value="육군/해병대">육군/해병대 (18개월)</SelectItem>
                         <SelectItem value="해군">해군 (20개월)</SelectItem>
+                        <SelectItem value="공군">공군 (21개월)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
