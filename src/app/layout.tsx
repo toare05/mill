@@ -17,6 +17,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#3B82F6",
 };
 
 export const metadata: Metadata = {
@@ -30,6 +31,20 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/favicon_new.ico", sizes: "any" },
+      { url: "/favicon-16x16_new.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32_new.png", sizes: "32x32", type: "image/png" }
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png?v=2" }
+    ],
+    other: [
+      { url: "/android-chrome-192x192.png?v=2", sizes: "192x192", type: "image/png" },
+      { url: "/android-chrome-512x512.png?v=2", sizes: "512x512", type: "image/png" }
+    ]
   },
   openGraph: {
     title: "공군 점수 | 계산기밀",
@@ -59,7 +74,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon_new.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16_new.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32_new.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png?v=2" />
+        <link rel="mask-icon" href="/favicon-32x32_new.png" color="#3B82F6" />
+        <link rel="manifest" href="/site.webmanifest?v=2" />
+        <meta name="theme-color" content="#3B82F6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="계산기밀" />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6559398788369653"

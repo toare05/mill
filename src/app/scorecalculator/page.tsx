@@ -16,8 +16,8 @@ import {
 } from "@/types";
 import { calculateScore } from "@/utils/calculateScore";
 import { MAX_SCORES } from "@/constants/scores";
-import ScoreForm from "@/components/ScoreForm";
-import ScoreResultComponent from "@/components/ScoreResult";
+import ScoreForm from "@/components/features/score-calculator/ScoreForm";
+import ScoreResultComponent from "@/components/features/score-calculator/ScoreResult";
 import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
 import Link from "next/link";
 
