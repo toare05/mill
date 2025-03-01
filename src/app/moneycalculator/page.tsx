@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import GoogleAdsense from "@/components/GoogleAdsense";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 
 // 은행별 금리 정보 타입 정의
 interface BankInterestRate {
@@ -471,11 +471,6 @@ export default function MoneyCalculator() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* 상단 광고 */}
-        <div className="mb-8">
-          <GoogleAdsense slot="3819366386" />
-        </div>
-
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">장병내일준비적금 계산기</h1>
           <p className="text-gray-600">월 납입액, 복무기간, 혜택 등을 입력하여 만기 수령액을 계산해보세요.</p>
@@ -543,9 +538,9 @@ export default function MoneyCalculator() {
                         <SelectValue placeholder="군종 선택" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="공군">공군 (21개월)</SelectItem>
                         <SelectItem value="육군/해병대">육군/해병대 (18개월)</SelectItem>
                         <SelectItem value="해군">해군 (20개월)</SelectItem>
-                        <SelectItem value="공군">공군 (21개월)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -862,20 +857,24 @@ export default function MoneyCalculator() {
           </div>
         </div>
         
-        {/* 하단 광고 */}
-        <div className="mt-8">
-          <GoogleAdsense slot="5108411687" />
-        </div>
-        
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>※ 본 계산기는 참고용이며, 실제 금융상품의 조건과 다를 수 있습니다.</p>
           <p>※ 정확한 정보는 관련 금융기관 또는 정부 기관의 공식 홈페이지를 참고하시기 바랍니다.</p>
-          <p className="mt-2">※ 참고 자료: 
-            <a href="https://m.blog.naver.com/meaning87/223562710943" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">은퇴연구소 블로그</a>,
-            <a href="https://www.banksalad.com/articles/2023-군인적금-장병내일준비적금" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">뱅크샐러드</a>,
-            <a href="https://mma.go.kr/board/boardView.do?mc=usr0000379&gesipan_id=2&gsgeul_no=1518778" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">병무청</a>,
-            <a href="https://blog.naver.com/mma9090/223957425127" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">병무청 블로그 - 2025년 군인 월급</a>
+        </div>
+        
+        {/* 다른 계산기로 이동하는 링크 */}
+        <div className="mt-12 p-6 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">공군 지원 점수 계산기도 이용해보세요</h3>
+          <p className="text-gray-600 mb-4">
+            공군 지원을 준비 중이신가요? 자격/면허, 전공, 출결, 가산점 등을 입력하여<br />
+            공군 지원 1차 점수를 실시간으로 계산하고, 선발 점수와 비교해볼 수 있습니다.
           </p>
+          <Link href="/scorecalculator" className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+            공군 점수 계산기로 이동
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </Link>
         </div>
       </div>
     </main>

@@ -3,17 +3,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import GoogleAdsense from "@/components/GoogleAdsense";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* 상단 광고 */}
-        <div className="mb-8">
-          <GoogleAdsense slot="9643547680" />
-        </div>
-
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">계산기밀</h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
@@ -64,11 +58,6 @@ export default function Home() {
               </Link>
             </CardFooter>
           </Card>
-        </div>
-
-        {/* 하단 광고 */}
-        <div className="mt-12">
-          <GoogleAdsense slot="1766592881" />
         </div>
       </div>
     </main>

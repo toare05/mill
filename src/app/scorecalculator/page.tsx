@@ -19,7 +19,7 @@ import { MAX_SCORES } from "@/constants/scores";
 import ScoreForm from "@/components/ScoreForm";
 import ScoreResultComponent from "@/components/ScoreResult";
 import { RECRUITMENT_MONTH_OPTIONS } from "@/constants/cutoffScores";
-import GoogleAdsense from "@/components/GoogleAdsense";
+import Link from "next/link";
 
 export default function ScoreCalculator() {
   // 초기 사용자 입력 데이터
@@ -53,10 +53,6 @@ export default function ScoreCalculator() {
     setUserData({
       ...userData,
       soldierType: type,
-      certificate: "none",
-      major: "nonMajor",
-      attendance: "absence0",
-      bonusPoints: [],
       specialty
     });
   };
@@ -103,23 +99,9 @@ export default function ScoreCalculator() {
   
   // 특기 변경 핸들러
   const handleSpecialtyChange = (specialty: SpecialtyType) => {
-    let updatedCertificate = userData.certificate;
-    
-    // 차량운전 특기에서 다른 특기로 변경될 때 운전면허 관련 자격증을 선택한 상태라면 자격증을 'none'으로 변경
-    if (userData.specialty === 'driving' && specialty !== 'driving') {
-      if (
-        userData.certificate === 'largeSpecial' || 
-        userData.certificate === 'type1Manual' || 
-        userData.certificate === 'type2Manual'
-      ) {
-        updatedCertificate = 'none';
-      }
-    }
-    
     setUserData({
       ...userData,
-      specialty,
-      certificate: updatedCertificate
+      specialty
     });
   };
   
@@ -145,11 +127,6 @@ export default function ScoreCalculator() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* 상단 광고 */}
-        <div className="mb-8">
-          <GoogleAdsense slot="7397457288" />
-        </div>
-
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">공군 지원 1차 점수 계산기</h1>
           <p className="text-gray-600">자격/면허, 전공, 출결, 가산점을 입력하여 1차 점수를 계산해보세요.</p>
@@ -159,13 +136,10 @@ export default function ScoreCalculator() {
           {/* 입력 폼 */}
           <div className="lg:col-span-2">
             <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <CardHeader className="border-b border-gray-100 p-6">
-                <CardTitle>점수 계산 입력</CardTitle>
-              </CardHeader>
               <CardContent className="p-6">
                 {/* 지원 월 선택 */}
                 <div className="mb-6">
-                  <Label htmlFor="recruitmentMonth" className="text-base font-medium text-blue-700 block mb-3">지원 월 선택</Label>
+                  <Label htmlFor="recruitmentMonth" className="text-base font-medium text-gray-700 block mb-3">지원 월 선택</Label>
                   <Select
                     value={userData.recruitmentMonth}
                     onValueChange={handleRecruitmentMonthChange}
@@ -244,9 +218,19 @@ export default function ScoreCalculator() {
           </div>
         </div>
 
-        {/* 하단 광고 */}
-        <div className="mt-8">
-          <GoogleAdsense slot="8520502489" />
+        {/* 다른 계산기로 이동하는 링크 */}
+        <div className="mt-12 p-6 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">장병내일준비적금 계산기도 이용해보세요</h3>
+          <p className="text-gray-600 mb-4">
+            군 복무 중 받는 월급으로 장병내일준비적금에 가입하면 얼마를 모을 수 있을까요?<br />
+            매월 적립액, 복무기간, 이자율을 입력하여 만기 시 예상 수령액을 계산해보세요.
+          </p>
+          <Link href="/moneycalculator" className="inline-flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+            장병내일준비적금 계산기로 이동
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </Link>
         </div>
       </div>
     </main>
