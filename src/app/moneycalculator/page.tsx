@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -184,7 +184,7 @@ export default function MoneyCalculator() {
   const [militaryType, setMilitaryType] = useState("육군/해병대");
   
   // 입력값 변경 핸들러들
-  const handleMonthlySavingsChange = (value: string) => {
+  const handleMonthlySavingsChange = useCallback((value: string) => {
     const amount = Number(value);
     if (!isNaN(amount) && amount >= 0) {
       // 입대 연도가 2025년 이상인 경우 단일 슬라이더만 사용
@@ -192,105 +192,95 @@ export default function MoneyCalculator() {
         const maxLimit = 55; // 2025년부터는 55만원 한도
         const cappedAmount = Math.min(amount, maxLimit);
         
-        setInputData({
-          ...inputData,
+        setInputData(prevData => ({
+          ...prevData,
           monthlySavings: cappedAmount,
           isYear2025: true
-        });
+        }));
       } else {
         // 2024년 슬라이더인 경우 그대로 사용
-        setInputData({
-          ...inputData,
+        setInputData(prevData => ({
+          ...prevData,
           monthlySavings: amount
-        });
+        }));
       }
     }
-  };
+  }, [enlistmentYear]);
   
   // 기본 금리 변경 핸들러 (통합 금리로 변경)
-  const handleInterestRateChange = (value: string) => {
+  const handleInterestRateChange = useCallback((value: string) => {
     const rate = parseFloat(value);
     if (!isNaN(rate) && rate >= 0) {
-      setInputData({
-        ...inputData,
+      setInputData(prevData => ({
+        ...prevData,
         interestRate: rate
-      });
+      }));
     }
-  };
+  }, []);
   
   // 2024년용 월 납입액 변경 핸들러
-  const handleMonthlySavings2024Change = (value: string) => {
+  const handleMonthlySavings2024Change = useCallback((value: string) => {
     const amount = Number(value);
     if (!isNaN(amount) && amount >= 0) {
       const maxLimit = 40; // 2024년은 40만원 한도
       const cappedAmount = Math.min(amount, maxLimit);
       
-      setInputData({
-        ...inputData,
+      setInputData(prevData => ({
+        ...prevData,
         monthlySavings2024: cappedAmount
-      });
+      }));
     }
-  };
+  }, []);
   
   // 2025년용 월 납입액 변경 핸들러
-  const handleMonthlySavings2025Change = (value: string) => {
+  const handleMonthlySavings2025Change = useCallback((value: string) => {
     const amount = Number(value);
     if (!isNaN(amount) && amount >= 0) {
       const maxLimit = 55; // 2025년은 55만원 한도
       const cappedAmount = Math.min(amount, maxLimit);
       
-      setInputData({
-        ...inputData,
+      setInputData(prevData => ({
+        ...prevData,
         monthlySavings2025: cappedAmount
-      });
+      }));
     }
-  };
+  }, []);
   
-  const handleEnlistmentMonthChange = (value: string) => {
+  const handleEnlistmentMonthChange = useCallback((value: string) => {
     setEnlistmentMonth(value);
-  };
+  }, []);
   
-  const handleEnlistmentYearChange = (value: string) => {
+  const handleEnlistmentYearChange = useCallback((value: string) => {
     setEnlistmentYear(value);
     
+    // 입대 연도가 2025년 이상이면 isYear2025를 true로 설정
     if (parseInt(value) >= 2025) {
-      // 2025년 이상인 경우 단일 슬라이더 사용
-      setInputData({
-        ...inputData,
-        isYear2025: true,
-        monthlySavings: Math.min(inputData.monthlySavings, 55)
-      });
+      setInputData(prevData => ({
+        ...prevData,
+        isYear2025: true
+      }));
     } else {
-      // 2024년인 경우 두 개의 슬라이더 사용
-      setInputData({
-        ...inputData,
-        isYear2025: false,
-        monthlySavings2024: 40, // 기본값으로 설정
-        monthlySavings2025: 55  // 기본값으로 설정
-      });
+      setInputData(prevData => ({
+        ...prevData,
+        isYear2025: false
+      }));
     }
-  };
+  }, []);
   
-  const handleMilitaryTypeChange = (value: string) => {
+  const handleMilitaryTypeChange = useCallback((value: string) => {
     setMilitaryType(value);
-    // 군 종류에 따라 복무 기간도 업데이트
-    let serviceMonths = 18;
-    if (value === "육군/해병대") {
-      serviceMonths = 18;
-    } else if (value === "해군") {
-      serviceMonths = 20;
-    } else if (value === "공군") {
-      serviceMonths = 21;
-    }
     
-    setInputData({
-      ...inputData,
+    // 군 종류에 따라 복무 개월 수 자동 설정
+    const serviceMonths = rankPeriods[value as keyof typeof rankPeriods].total;
+    
+    setInputData(prevData => ({
+      ...prevData,
       serviceMonths
-    });
-  };
+    }));
+  }, []);
   
   // 입대월/연도에 따른 계급별 기간 계산
-  const calculateRankPeriods = () => {
+  const calculateRankPeriods = useCallback(() => {
     const startMonth = parseInt(enlistmentMonth);
     const startYear = parseInt(enlistmentYear);
     const serviceMonthsTotal = rankPeriods[militaryType as keyof typeof rankPeriods].total;
@@ -329,10 +319,10 @@ export default function MoneyCalculator() {
         end: { year: sergeantEndYear, month: sergeantEndMonth } 
       }
     };
-  };
+  }, [enlistmentMonth, enlistmentYear, militaryType, inputData.serviceMonths]);
   
   // 계급별 월급 계산
-  const calculateSalaryByRank = () => {
+  const calculateSalaryByRank = useCallback(() => {
     const rankPeriods = calculateRankPeriods();
     
     const result = [];
@@ -368,15 +358,18 @@ export default function MoneyCalculator() {
     }
     
     return result;
-  };
+  }, [enlistmentMonth, enlistmentYear, militaryType, inputData.serviceMonths]);
   
   // 장병내일준비적금 수령액 계산 함수
-  const calculateTotal = (): { total: number; breakdown: CalculationBreakdown & { remainingSavings: number } } => {
+  const calculationResult = useMemo(() => {
     // 월 납입액 계산 (만원 단위를 원 단위로 변환)
     // 입대 연도가 2024년인 경우 2024년과 2025년 납입액을 각각 고려
     let totalDeposit = 0;
     // 월급에서 저축액을 제외한 나머지 금액의 총합
     let totalRemaining = 0;
+    
+    // 월급 정보 미리 계산
+    const salaries = calculateSalaryByRank();
     
     if (parseInt(enlistmentYear) >= 2025) {
       // 2025년 이상 입대자는 모든 월에 동일 금액 적용
@@ -384,7 +377,6 @@ export default function MoneyCalculator() {
       totalDeposit = monthlyAmount * inputData.serviceMonths;
       
       // 월급에서 적금 납입액을 제외한 나머지 금액 계산
-      const salaries = calculateSalaryByRank();
       for (const salaryInfo of salaries) {
         const depositAmount = monthlyAmount;
         const remainingAmount = salaryInfo.salary - depositAmount;
@@ -419,7 +411,6 @@ export default function MoneyCalculator() {
       totalDeposit = deposit2024 + deposit2025;
       
       // 월급에서 적금 납입액을 제외한 나머지 금액 계산
-      const salaries = calculateSalaryByRank();
       for (const salaryInfo of salaries) {
         let depositAmount = 0;
         if (salaryInfo.year >= 2025) {
@@ -437,28 +428,40 @@ export default function MoneyCalculator() {
     }
     
     // 단리 방식으로 이자 계산 - 사용자가 설정한 통합 금리 사용
-    const totalInterest = totalDeposit * (inputData.interestRate / 100) * (inputData.serviceMonths / 12);
+    const baseInterest = totalDeposit * (inputData.interestRate / 100) * (inputData.serviceMonths / 12);
     
     // 정부 매칭 지원금 (전체 납입액에 대해 1:1 매칭)
     const governmentMatch = inputData.governmentMatch ? totalDeposit : 0;
     
     // 총 수령액 (장병내일준비적금 + 나머지 저축금액)
-    const total = totalDeposit + totalInterest + governmentMatch + totalRemaining;
+    const total = totalDeposit + baseInterest + governmentMatch + totalRemaining;
     
-    // 항목별 내역 (통합 금리 기준 변경)
-    const breakdown = {
-      totalDeposit,
-      baseInterest: totalInterest,
-      additionalInterest: 0,  // 통합 금리에 이미 포함되어 있으므로 0으로 설정
-      governmentMatch,
-      remainingSavings: totalRemaining
+    // 항목별 내역
+    return {
+      total,
+      breakdown: {
+        totalDeposit,
+        baseInterest,
+        additionalInterest: 0, // 추가 이자는 없음 (통합 금리로 계산)
+        governmentMatch,
+        remainingSavings: totalRemaining
+      }
     };
-    
-    return { total, breakdown };
-  };
+  }, [
+    inputData.monthlySavings,
+    inputData.monthlySavings2024,
+    inputData.monthlySavings2025,
+    inputData.serviceMonths,
+    inputData.interestRate,
+    inputData.governmentMatch,
+    inputData.remainingSavingsRate,
+    enlistmentMonth,
+    enlistmentYear,
+    calculateSalaryByRank
+  ]);
   
   // 계산 결과
-  const result = calculateTotal();
+  const result = calculationResult;
   
   // 금리 정보 표시 상태 관리
   const [showRateInfo, setShowRateInfo] = useState(false);

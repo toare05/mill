@@ -13,13 +13,10 @@ export function calculateScore(userData: UserInputData): ScoreResult {
   
   // 운전면허 관련 자격증은 차량운전 특기일 때만 점수 부여
   if (userData.soldierType === 'specialized' && 
-      (userData.certificate === 'largeSpecial' || 
-       userData.certificate === 'type1Manual' || 
-       userData.certificate === 'type2Manual')) {
-    if (userData.specialty !== 'driving') {
-      // 차량운전 특기가 아닌 경우 'none'과 동일한 점수 부여
-      certificateScore = CERTIFICATE_SCORES[userData.soldierType]['none'];
-    }
+      ['largeSpecial', 'type1Manual', 'type2Manual'].includes(userData.certificate) && 
+      userData.specialty !== 'driving') {
+    // 차량운전 특기가 아닌 경우 'none'과 동일한 점수 부여
+    certificateScore = CERTIFICATE_SCORES[userData.soldierType]['none'];
   }
   
   // 전공 점수 계산
@@ -29,30 +26,29 @@ export function calculateScore(userData: UserInputData): ScoreResult {
   const attendanceScore = ATTENDANCE_SCORES[userData.soldierType][userData.attendance];
   
   // 가산점 계산
-  let bonusPointsScore = 0;
+  // 사회봉사활동 점수와 헌혈 점수는 별도로 계산 후 합산 (최대 8점)
+  const volunteerPoints = userData.bonusPoints
+    .find(bp => bp.startsWith('volunteerHours'));
   
-  // 사회봉사활동 점수 계산
-  const volunteerBonusPoints = userData.bonusPoints
-    .filter(bp => bp.startsWith('volunteerHours'))
-    .map(bp => BONUS_POINT_SCORES[bp])
-    .sort((a, b) => b - a)[0] || 0;
+  const bloodDonationPoints = userData.bonusPoints
+    .find(bp => bp.startsWith('bloodDonation'));
   
-  // 헌혈 점수 계산
-  const bloodDonationBonusPoints = userData.bonusPoints
-    .filter(bp => bp.startsWith('bloodDonation'))
-    .map(bp => BONUS_POINT_SCORES[bp])
-    .sort((a, b) => b - a)[0] || 0;
+  // 사회봉사활동 점수
+  const volunteerBonusPoints = volunteerPoints ? BONUS_POINT_SCORES[volunteerPoints] : 0;
+  
+  // 헌혈 점수
+  const bloodDonationBonusPoints = bloodDonationPoints ? BONUS_POINT_SCORES[bloodDonationPoints] : 0;
   
   // 사회봉사활동과 헌혈 점수의 합계 (최대 8점)
   const socialBonusPoints = Math.min(volunteerBonusPoints + bloodDonationBonusPoints, 8);
   
-  // 기타 가산점 계산
+  // 기타 가산점 계산 (사회봉사활동과 헌혈 제외)
   const otherBonusPoints = userData.bonusPoints
     .filter(bp => !bp.startsWith('volunteerHours') && !bp.startsWith('bloodDonation'))
     .reduce((sum, bp) => sum + BONUS_POINT_SCORES[bp], 0);
   
   // 총 가산점 (최대 15점)
-  bonusPointsScore = Math.min(socialBonusPoints + otherBonusPoints, MAX_BONUS_POINTS);
+  const bonusPointsScore = Math.min(socialBonusPoints + otherBonusPoints, MAX_BONUS_POINTS);
   
   // 총점 계산
   const totalScore = certificateScore + majorScore + attendanceScore + bonusPointsScore;

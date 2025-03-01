@@ -7,6 +7,7 @@ import {
   getLastYearSameMonthCutoffScore
 } from "@/constants/cutoffScores";
 import { ScoreResult as ScoreResultType, SoldierType, SpecialtyType } from "@/types";
+import { useMemo } from "react";
 
 interface ScoreResultProps {
   scoreResult: ScoreResultType;
@@ -29,7 +30,7 @@ export default function ScoreResult({
   };
 
   // 총점 퍼센트
-  const totalPercent = calculatePercent(scoreResult.totalScore, maxScore);
+  const totalPercent = useMemo(() => calculatePercent(scoreResult.totalScore, maxScore), [scoreResult.totalScore, maxScore]);
 
   // 점수 바 색상 결정
   const getScoreBarColor = (percent: number) => {
@@ -43,23 +44,33 @@ export default function ScoreResult({
   // 특기 표시 이름
   const specialtyDisplayName = SPECIALTY_DISPLAY_NAMES[specialty];
   
-  // 모집월 파싱 (예: "2025년 6월" -> { year: 2025, month: 6 })
-  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
-  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
-  
-  if (!yearMatch || !monthMatch) {
-    console.error("Invalid recruitment month format:", recruitmentMonth);
-    return null;
-  }
-  
-  const year = parseInt(yearMatch[1]);
-  const month = parseInt(monthMatch[1]);
-  
-  // 이전 달 데이터
-  const previousMonthData = getPreviousMonthCutoffScore(year, month, specialtyDisplayName);
-  
-  // 작년 같은 달 데이터
-  const lastYearData = getLastYearSameMonthCutoffScore(year, month, specialtyDisplayName);
+  // 모집월 파싱 및 비교 데이터 계산
+  const { year, month, previousMonthData, lastYearData } = useMemo(() => {
+    // 모집월 파싱 (예: "2025년 6월" -> { year: 2025, month: 6 })
+    const yearMatch = recruitmentMonth.match(/(\d{4})년/);
+    const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
+    
+    if (!yearMatch || !monthMatch) {
+      console.error("Invalid recruitment month format:", recruitmentMonth);
+      return { year: 0, month: 0, previousMonthData: null, lastYearData: null };
+    }
+    
+    const parsedYear = parseInt(yearMatch[1]);
+    const parsedMonth = parseInt(monthMatch[1]);
+    
+    // 이전 달 데이터
+    const prevMonthData = getPreviousMonthCutoffScore(parsedYear, parsedMonth, specialtyDisplayName);
+    
+    // 작년 같은 달 데이터
+    const lastYearMonthData = getLastYearSameMonthCutoffScore(parsedYear, parsedMonth, specialtyDisplayName);
+    
+    return { 
+      year: parsedYear, 
+      month: parsedMonth, 
+      previousMonthData: prevMonthData, 
+      lastYearData: lastYearMonthData 
+    };
+  }, [recruitmentMonth, specialtyDisplayName]);
   
   // 현재 점수와 커트라인 비교
   const getComparisonResult = (cutoffScore: number | null) => {
@@ -82,13 +93,18 @@ export default function ScoreResult({
     }
   };
   
-  const previousComparison = previousMonthData && previousMonthData.score !== null && previousMonthData.score !== 99999
-    ? getComparisonResult(previousMonthData.score) 
-    : null;
-  
-  const lastYearComparison = lastYearData && lastYearData.score !== null && lastYearData.score !== 99999
-    ? getComparisonResult(lastYearData.score) 
-    : null;
+  // 비교 결과 메모이제이션
+  const { previousComparison, lastYearComparison } = useMemo(() => {
+    const prevComp = previousMonthData && previousMonthData.score !== null && previousMonthData.score !== 99999
+      ? getComparisonResult(previousMonthData.score) 
+      : null;
+    
+    const lastYearComp = lastYearData && lastYearData.score !== null && lastYearData.score !== 99999
+      ? getComparisonResult(lastYearData.score) 
+      : null;
+      
+    return { previousComparison: prevComp, lastYearComparison: lastYearComp };
+  }, [previousMonthData, lastYearData, scoreResult.totalScore]);
   
   // 상태에 따른 색상 클래스
   const getStatusColorClass = (status: string | null) => {

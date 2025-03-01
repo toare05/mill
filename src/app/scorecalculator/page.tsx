@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,10 +37,10 @@ export default function ScoreCalculator() {
   const [userData, setUserData] = useState<UserInputData>(initialUserData);
   
   // 점수 계산 결과
-  const scoreResult = calculateScore(userData);
+  const scoreResult = useMemo(() => calculateScore(userData), [userData]);
   
   // 군인 유형 변경 핸들러
-  const handleSoldierTypeChange = (type: SoldierType) => {
+  const handleSoldierTypeChange = useCallback((type: SoldierType) => {
     let specialty: SpecialtyType = "general";
     
     // 군인 유형에 따라 기본 특기 설정
@@ -50,63 +50,63 @@ export default function ScoreCalculator() {
       specialty = "electronic"; // 전문기술병의 경우 전자계산을 기본값으로
     }
     
-    setUserData({
-      ...userData,
+    setUserData(prevData => ({
+      ...prevData,
       soldierType: type,
       specialty
-    });
-  };
+    }));
+  }, []);
   
   // 자격/면허 변경 핸들러
-  const handleCertificateChange = (cert: CertificateType) => {
-    setUserData({
-      ...userData,
+  const handleCertificateChange = useCallback((cert: CertificateType) => {
+    setUserData(prevData => ({
+      ...prevData,
       certificate: cert
-    });
-  };
+    }));
+  }, []);
   
   // 전공 변경 핸들러
-  const handleMajorChange = (major: MajorType) => {
-    setUserData({
-      ...userData,
+  const handleMajorChange = useCallback((major: MajorType) => {
+    setUserData(prevData => ({
+      ...prevData,
       major
-    });
-  };
+    }));
+  }, []);
   
   // 출결 상황 변경 핸들러
-  const handleAttendanceChange = (attendance: AttendanceType) => {
-    setUserData({
-      ...userData,
+  const handleAttendanceChange = useCallback((attendance: AttendanceType) => {
+    setUserData(prevData => ({
+      ...prevData,
       attendance
-    });
-  };
+    }));
+  }, []);
   
   // 가산점 변경 핸들러
-  const handleBonusPointsChange = (bonusPoints: BonusPointType[]) => {
-    setUserData({
-      ...userData,
+  const handleBonusPointsChange = useCallback((bonusPoints: BonusPointType[]) => {
+    setUserData(prevData => ({
+      ...prevData,
       bonusPoints
-    });
-  };
+    }));
+  }, []);
   
   // 지원 월 변경 핸들러
-  const handleRecruitmentMonthChange = (month: string) => {
-    setUserData({
-      ...userData,
+  const handleRecruitmentMonthChange = useCallback((month: string) => {
+    setUserData(prevData => ({
+      ...prevData,
       recruitmentMonth: month
-    });
-  };
+    }));
+  }, []);
   
   // 특기 변경 핸들러
-  const handleSpecialtyChange = (specialty: SpecialtyType) => {
-    setUserData({
-      ...userData,
+  const handleSpecialtyChange = useCallback((specialty: SpecialtyType) => {
+    setUserData(prevData => ({
+      ...prevData,
       specialty
-    });
-  };
+    }));
+  }, []);
   
   // 특기 옵션 생성
-  const getSpecialtyOptions = () => {
+  const specialtyOptions = useMemo(() => {
     if (userData.soldierType === "general") {
       return [
         { value: "general" as SpecialtyType, label: "일반기술" }
@@ -122,7 +122,7 @@ export default function ScoreCalculator() {
         { value: "communication" as SpecialtyType, label: "통신전자전기" }
       ];
     }
-  };
+  }, [userData.soldierType]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
@@ -184,7 +184,7 @@ export default function ScoreCalculator() {
                           <SelectValue placeholder="특기를 선택하세요" />
                         </SelectTrigger>
                         <SelectContent>
-                          {getSpecialtyOptions().map((option) => (
+                          {specialtyOptions.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>

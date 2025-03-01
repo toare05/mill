@@ -38,31 +38,23 @@ export default function ScoreForm({
     if (checked) {
       let newBonusPoints = [...userData.bonusPoints];
       
-      // 같은 카테고리의 다른 항목 제거 (예: 한국사능력검정 3,4급과 1,2급은 중복 불가)
-      if (value.startsWith('koreanHistory')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('koreanHistory'));
-      }
-      if (value.startsWith('koreanLanguage')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('koreanLanguage'));
-      }
-      if (value.startsWith('englishToeic')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('englishToeic'));
-      }
-      if (value.startsWith('englishToefl')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('englishToefl'));
-      }
-      if (value.startsWith('englishTeps')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('englishTeps'));
-      }
+      // 같은 카테고리의 다른 항목 제거 (중복 선택 방지)
+      const categoryPrefixes = [
+        'koreanHistory', 
+        'koreanLanguage', 
+        'englishToeic', 
+        'englishToefl', 
+        'englishTeps',
+        'volunteerHours',
+        'bloodDonation'
+      ];
       
-      // 같은 종류의 사회봉사활동 중복 선택 방지
-      if (value.startsWith('volunteerHours')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('volunteerHours'));
-      }
+      // 현재 선택한 항목의 카테고리 접두사 찾기
+      const matchingPrefix = categoryPrefixes.find(prefix => value.startsWith(prefix));
       
-      // 같은 종류의 헌혈 중복 선택 방지
-      if (value.startsWith('bloodDonation')) {
-        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith('bloodDonation'));
+      if (matchingPrefix) {
+        // 같은 카테고리의 기존 항목 제거
+        newBonusPoints = newBonusPoints.filter(bp => !bp.startsWith(matchingPrefix));
       }
       
       onBonusPointsChange([...newBonusPoints, value]);
