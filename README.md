@@ -45,3 +45,34 @@ npm run dev
 ## 라이센스
 
 MIT
+
+## RSS 피드 및 사이트맵
+
+이 프로젝트는 다음과 같은 RSS 피드 및 사이트맵을 제공합니다:
+
+- 사이트맵: `/sitemap.xml`
+- 서버 사이트맵: `/api/server-sitemap.xml`
+- RSS 피드: `/api/rss.xml`
+
+### 사용 방법
+
+1. 사이트맵 생성
+   ```bash
+   npm run build
+   ```
+   빌드 후 자동으로 `postbuild` 스크립트가 실행되어 사이트맵이 생성됩니다.
+
+2. 사이트맵 제출
+   생성된 사이트맵을 다음 검색 엔진에 제출할 수 있습니다:
+   - Google Search Console: https://search.google.com/search-console
+   - Bing Webmaster Tools: https://www.bing.com/webmasters
+   - Naver Search Advisor: https://searchadvisor.naver.com
+
+3. RSS 피드 사용법
+   RSS 리더에서 `/api/rss.xml` 엔드포인트를 구독할 수 있습니다.
+
+### 설정 변경
+
+- 사이트맵 설정 변경: `next-sitemap.config.js` 파일 수정
+- RSS 피드 설정 변경: `src/app/api/rss.xml/route.ts` 파일 수정
+- 환경 변수 설정: `.env.local` 파일에서 `SITE_URL` 값 수정

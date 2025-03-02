@@ -1,23 +1,10 @@
-# Allow all crawlers
+# *
 User-agent: *
 Allow: /
 
-# Specific rules for Google
-User-agent: Googlebot
-Allow: /
+# Host
+Host: https://www.allformillitary.site
 
-# Specific rules for Google Mobile
-User-agent: Googlebot-Mobile
-Allow: /
-
-# Specific rules for Naver
-User-agent: Yeti
-Allow: /
-
-# Disallow all bots from accessing unnecessary paths
-User-agent: *
-Disallow: /api/
-Disallow: /_next/
-
-# Sitemap location
-Sitemap: https://allformilitary.site/sitemap.xml 
+# Sitemaps
+Sitemap: https://www.allformillitary.site/sitemap.xml
+Sitemap: https://www.allformillitary.site/api/server-sitemap.xml
