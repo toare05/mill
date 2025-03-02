@@ -4,7 +4,7 @@ module.exports = {
   generateRobotsTxt: true,
   robotsTxtOptions: {
     additionalSitemaps: [
-      'https://www.allformillitary.site/sitemap.xml',
+      'https://www.allformillitary.site/sitemap-0.xml',
       'https://www.allformillitary.site/api/server-sitemap.xml',
     ],
   },
