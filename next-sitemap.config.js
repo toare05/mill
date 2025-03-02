@@ -4,7 +4,7 @@ module.exports = {
   generateRobotsTxt: true,
   robotsTxtOptions: {
     additionalSitemaps: [
-      'https://www.allformillitary.site/sitemap-0.xml',
+      // 메인 사이트맵은 자동으로 포함되므로 추가 사이트맵만 나열
       'https://www.allformillitary.site/api/server-sitemap.xml',
     ],
   },

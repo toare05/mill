@@ -7,4 +7,3 @@ Host: https://www.allformillitary.site
 
 # Sitemaps
 Sitemap: https://www.allformillitary.site/sitemap.xml
-Sitemap: https://www.allformillitary.site/api/server-sitemap.xml
