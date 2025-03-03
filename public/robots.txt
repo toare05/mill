@@ -3,7 +3,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://www.allformillitary.site
+Host: https://allformillitary.site
 
 # Sitemaps
-Sitemap: https://www.allformillitary.site/sitemap.xml
+Sitemap: https://allformillitary.site/sitemap.xml
+Sitemap: https://allformillitary.site/api/server-sitemap.xml

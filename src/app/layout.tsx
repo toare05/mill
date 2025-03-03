@@ -23,9 +23,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "공군 점수 | 계산기밀",
-  description: "대한민국 공군 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
-  keywords: ["공군", "공군 점수 계산", "헌급방", "점수", "1차 점수", "병과", "전공", "자격증", "군복무"],
+  title: "계산기밀 | 대한민국 군 계산기 모음",
+  description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산과 장병내일준비적금 수령액 계산을 한 곳에서 이용해보세요.",
+  keywords: ["군대 계산기", "공군 점수", "장병내일준비적금", "군적금", "군 복무"],
   authors: [{ name: "toare", url: "" }],
   creator: "toare",
   publisher: "toare",
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
     ]
   },
   openGraph: {
-    title: "군대 정보 계산기 | 계산기밀",
-    description: "대한민국 군대 정보 계산기입니다. 공군 지원 점수 계산, 장병내일준비적금(군적금) 수령액 계산 등 다양한 계산기를 제공합니다.",
+    title: "계산기밀 | 대한민국 군 계산기 모음",
+    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산, 장병내일준비적금(군적금) 수령액 계산 등 다양한 계산기를 제공합니다.",
     url: "https://allformilitary.site",
     siteName: "계산기밀",
     locale: "ko_KR",
@@ -100,8 +100,8 @@ export default function RootLayout({
             {
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "공군 점수",
-              "description": "대한민국 공군 지원을 위한 합격 점수 계산기입니다. 병과, 전공, 자격증 등의 정보를 입력하여 예상 점수를 확인하세요.",
+              "name": "계산기밀",
+              "description": "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산과 장병내일준비적금 수령액 계산을 한 곳에서 이용해보세요.",
               "applicationCategory": "UtilityApplication",
               "offers": {
                 "@type": "Offer",
