@@ -1,11 +1,11 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://www.allformillitary.site',
+  siteUrl: 'https://allformillitary.site',
   generateRobotsTxt: true,
   robotsTxtOptions: {
     additionalSitemaps: [
       // 메인 사이트맵은 자동으로 포함되므로 추가 사이트맵만 나열
-      'https://www.allformillitary.site/api/server-sitemap.xml',
+      'https://allformillitary.site/api/server-sitemap.xml',
     ],
   },
   exclude: ['/api/*'],

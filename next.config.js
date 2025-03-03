@@ -2,7 +2,7 @@
 const nextConfig = {
   /* config options here */
   images: {
-    domains: ['allformilitary.site'],
+    domains: ['allformillitary.site'],
     formats: ['image/avif', 'image/webp'],
   },
   compress: true,
