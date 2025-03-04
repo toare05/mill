@@ -46,10 +46,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-xl font-semibold mb-3">5. 광고 서비스에 관한 사항</h2>
             <p className="text-gray-700">
-              본 웹사이트는 Google AdSense 광고 서비스를 사용합니다. Google AdSense는 쿠키를 사용하여 이용자의 웹사이트 방문 기록을 바탕으로 관심사에 맞는 광고를 표시합니다.
-            </p>
-            <p className="text-gray-700 mt-2">
-              Google의 광고 쿠키 사용에 대한 자세한 정보는 <a href="https://policies.google.com/technologies/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google 광고 및 개인정보 보호 정책</a>에서 확인하실 수 있습니다.
+              본 웹사이트는 현재 광고 서비스를 사용하지 않습니다.
             </p>
           </section>
 
