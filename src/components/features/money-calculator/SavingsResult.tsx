@@ -1,26 +1,17 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// 계산 내역 타입 정의
-interface CalculationBreakdown {
-  totalDeposit: number;           // 총 납입액
-  baseInterest: number;           // 기본 이자
-  additionalInterest: number;     // 추가 이자
-  governmentMatch: number;        // 정부 매칭 지원금
-}
+import { CalculationBreakdown } from "@/types";
 
 interface SavingsResultProps {
   totalAmount: number;
   breakdown: CalculationBreakdown;
-  selectedBank: string;
   interestRate: number;
 }
 
 export default function SavingsResult({
   totalAmount,
   breakdown,
-  selectedBank,
   interestRate
 }: SavingsResultProps) {
   // 금액을 원화 형식으로 포맷팅하는 함수
@@ -43,7 +34,7 @@ export default function SavingsResult({
             {formatCurrency(totalAmount)}
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            {selectedBank} 금리 {interestRate}% 기준
+            금리 {interestRate}% 기준
           </p>
         </div>
 

@@ -5,54 +5,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
+import { 
+  SavingsInputData, 
+  CalculationBreakdown,
+  MilitaryRank,
+  MilitarySalaryInfo
+} from "@/types";
 
-// 은행별 금리 정보 타입 정의
-interface BankInterestRate {
-  bankName: string;         // 은행 이름
-  baseRate: number;         // 기본 금리 (%)
-  additionalRate: number;   // 우대 금리 (%)
-  totalRate: number;        // 총 금리 (%)
-  specialBenefits: string;  // 특별 혜택
-  minDeposit?: number;      // 최소 납입액
-  maxDeposit?: number;      // 최대 납입액 (별도 한도가 있는 경우)
-  officialLink: string;     // 공식 웹사이트 링크
-}
 
-// 장병내일준비적금 계산 필요한 타입 정의
-interface SavingsInputData {
-  monthlySavings: number;          // 월 납입액
-  serviceMonths: number;           // 복무 개월 수
-  interestRate: number;            // 총 금리 (기본금리+우대금리)
-  governmentMatch: boolean;        // 정부 매칭 지원금
-  isYear2025: boolean;             // 2025년 이후 납입 여부 (한도 55만원)
-  selectedBank: string;            // 선택한 은행
-  militaryRank?: string;           // 군 계급 (선택사항)
-  monthlySavings2024?: number;     // 2024년 월 납입액 (만원)
-  monthlySavings2025?: number;     // 2025년 월 납입액 (만원)
-}
-
-// 계산 결과 내역 타입 정의
-interface CalculationBreakdown {
-  totalDeposit: number;           // 총 납입액
-  baseInterest: number;           // 기본 이자
-  additionalInterest: number;     // 추가 이자
-  governmentMatch: number;        // 정부 매칭 지원금
-}
 
 // 군 계급별 월급 정보 (2024년 기준)
-const militaryRanks2024 = [
-  { rank: "이병", monthlySalary: 640000, recommendedSavings: 15 },
-  { rank: "일병", monthlySalary: 800000, recommendedSavings: 20 },
-  { rank: "상병", monthlySalary: 1000000, recommendedSavings: 25 },
-  { rank: "병장", monthlySalary: 1250000, recommendedSavings: 30 }
+const militaryRanks2024: MilitarySalaryInfo[] = [
+  { rank: "이병" as MilitaryRank, monthlySalary: 640000, recommendedSavings: 15 },
+  { rank: "일병" as MilitaryRank, monthlySalary: 800000, recommendedSavings: 20 },
+  { rank: "상병" as MilitaryRank, monthlySalary: 1000000, recommendedSavings: 25 },
+  { rank: "병장" as MilitaryRank, monthlySalary: 1250000, recommendedSavings: 30 }
 ];
 
 // 군 계급별 월급 정보 (2025년 기준)
-const militaryRanks2025 = [
-  { rank: "이병", monthlySalary: 750000, recommendedSavings: 15 },
-  { rank: "일병", monthlySalary: 900000, recommendedSavings: 20 },
-  { rank: "상병", monthlySalary: 1200000, recommendedSavings: 25 },
-  { rank: "병장", monthlySalary: 1500000, recommendedSavings: 35 }
+const militaryRanks2025: MilitarySalaryInfo[] = [
+  { rank: "이병" as MilitaryRank, monthlySalary: 750000, recommendedSavings: 15 },
+  { rank: "일병" as MilitaryRank, monthlySalary: 900000, recommendedSavings: 20 },
+  { rank: "상병" as MilitaryRank, monthlySalary: 1200000, recommendedSavings: 25 },
+  { rank: "병장" as MilitaryRank, monthlySalary: 1500000, recommendedSavings: 35 }
 ];
 
 // 기본 복무기간 및 계급 규정
@@ -86,73 +61,11 @@ const enlistmentMonthOptions = Array.from({ length: 12 }, (_, i) => ({
   label: `${i + 1}월`
 }));
 
-// 예시 데이터 - 은행별 금리 정보 (2024년 8월 기준, 뱅크샐러드 자료 참고)
-const bankRates: BankInterestRate[] = [
-  { 
-    bankName: "국민은행", 
-    baseRate: 5.0, 
-    additionalRate: 1.0, 
-    totalRate: 6.0,
-    specialBenefits: "KB국민카드 연계 혜택",
-    officialLink: "https://www.kbstar.com"
-  },
-  { 
-    bankName: "우리은행", 
-    baseRate: 5.1, 
-    additionalRate: 1.0, 
-    totalRate: 6.1,
-    specialBenefits: "우리 WON 뱅킹 앱 가입시 우대",
-    officialLink: "https://www.wooribank.com"
-  },
-  { 
-    bankName: "하나은행", 
-    baseRate: 5.2, 
-    additionalRate: 0.9, 
-    totalRate: 6.1,
-    specialBenefits: "하나멤버스 포인트 적립 혜택",
-    officialLink: "https://www.hanabank.com"
-  },
-  { 
-    bankName: "신한은행", 
-    baseRate: 5.3, 
-    additionalRate: 0.8, 
-    totalRate: 6.1,
-    specialBenefits: "SOL 앱 가입 우대",
-    officialLink: "https://www.shinhan.com"
-  },
-  { 
-    bankName: "NH농협은행", 
-    baseRate: 5.1, 
-    additionalRate: 1.1, 
-    totalRate: 6.2,
-    specialBenefits: "NH앱 가입시 추가 우대금리",
-    officialLink: "https://banking.nonghyup.com"
-  },
-  { 
-    bankName: "IBK기업은행", 
-    baseRate: 5.2, 
-    additionalRate: 0.9, 
-    totalRate: 6.1,
-    specialBenefits: "i-ONE뱅크 앱 가입 우대",
-    officialLink: "https://www.ibk.co.kr"
-  },
-  { 
-    bankName: "SC제일은행", 
-    baseRate: 5.0, 
-    additionalRate: 0.9, 
-    totalRate: 5.9,
-    specialBenefits: "모바일뱅킹 가입 시 우대금리",
-    officialLink: "https://www.standardchartered.co.kr"
-  },
-  { 
-    bankName: "부산은행", 
-    baseRate: 5.1, 
-    additionalRate: 0.8, 
-    totalRate: 5.9,
-    specialBenefits: "썸뱅크 앱 가입 우대",
-    officialLink: "https://www.busanbank.co.kr"
-  }
-];
+// 월 선택 옵션
+const monthOptions = Array.from({ length: 12 }, (_, i) => ({
+  value: `${i + 1}`,
+  label: `${i + 1}월`
+}));
 
 export default function MoneyCalculator() {
   // 초기 입력값 설정
@@ -162,7 +75,6 @@ export default function MoneyCalculator() {
     interestRate: 5.0,           // 총 금리 (기본값 5.0%)
     governmentMatch: true,       // 정부 매칭 지원금 (항상 true로 고정)
     isYear2025: true,            // 2025년 이후 기준 (기본값)
-    selectedBank: "국민은행",     // 기본 선택 은행 (남겨두지만 UI에서는 제거)
     monthlySavings2024: 40,      // 2024년 월 납입액 (기본 40만원)
     monthlySavings2025: 55,      // 2025년 월 납입액 (기본 55만원)
   };
@@ -331,7 +243,7 @@ export default function MoneyCalculator() {
              (currentYear === period.end.year && currentMonth <= period.end.month)) {
         // 해당 년도의 월급 정보 선택
         const salaryInfo = currentYear >= 2025 ? militaryRanks2025 : militaryRanks2024;
-        const rankInfo = salaryInfo.find(r => r.rank === rank);
+        const rankInfo = salaryInfo.find(r => r.rank === rank as MilitaryRank);
         
         if (rankInfo) {
           result.push({
@@ -566,14 +478,6 @@ export default function MoneyCalculator() {
   // 계산 결과
   const result = calculationResult;
   
-  // 금리 정보 표시 상태 관리
-  const [showRateInfo, setShowRateInfo] = useState(false);
-  
-  // 금리 정보 토글 핸들러
-  const toggleRateInfo = () => {
-    setShowRateInfo(!showRateInfo);
-  };
-  
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
@@ -602,9 +506,9 @@ export default function MoneyCalculator() {
                         <SelectValue placeholder="입대 연도 선택" />
                       </SelectTrigger>
                       <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
-                        <SelectItem value="2024" className="cursor-pointer hover:bg-blue-50">2024년</SelectItem>
-                        <SelectItem value="2025" className="cursor-pointer hover:bg-blue-50">2025년</SelectItem>
-                        <SelectItem value="2026" className="cursor-pointer hover:bg-blue-50">2026년</SelectItem>
+                        <SelectItem value="2024" className="cursor-pointer">2024년</SelectItem>
+                        <SelectItem value="2025" className="cursor-pointer">2025년</SelectItem>
+                        <SelectItem value="2026" className="cursor-pointer">2026년</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -623,7 +527,7 @@ export default function MoneyCalculator() {
                       </SelectTrigger>
                       <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
                         {enlistmentMonthOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value} className="cursor-pointer hover:bg-blue-50">
+                          <SelectItem key={option.value} value={option.value} className="cursor-pointer">
                             {option.label}
                           </SelectItem>
                         ))}
@@ -644,9 +548,9 @@ export default function MoneyCalculator() {
                         <SelectValue placeholder="군종 선택" />
                       </SelectTrigger>
                       <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200">
-                        <SelectItem value="육군/해병대" className="cursor-pointer hover:bg-blue-50">육군/해병대 (18개월)</SelectItem>
-                        <SelectItem value="해군" className="cursor-pointer hover:bg-blue-50">해군 (20개월)</SelectItem>
-                        <SelectItem value="공군" className="cursor-pointer hover:bg-blue-50">공군 (21개월)</SelectItem>
+                        <SelectItem value="육군/해병대" className="cursor-pointer">육군/해병대 (18개월)</SelectItem>
+                        <SelectItem value="해군" className="cursor-pointer">해군 (20개월)</SelectItem>
+                        <SelectItem value="공군" className="cursor-pointer">공군 (21개월)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -835,66 +739,12 @@ export default function MoneyCalculator() {
                     </SelectTrigger>
                     <SelectContent className="bg-white rounded-lg shadow-lg border border-gray-200 max-h-[200px] overflow-y-auto">
                       {Array.from({ length: 31 }, (_, i) => (5 + i * 0.1).toFixed(1)).map((rate) => (
-                        <SelectItem key={rate} value={rate} className="cursor-pointer hover:bg-blue-50">
+                        <SelectItem key={rate} value={rate} className="cursor-pointer">
                           {rate}%
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  
-                  {/* 금리 확인하기 토글 버튼 */}
-                  <div className="mt-2 text-left">
-                    <button 
-                      onClick={toggleRateInfo}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline inline-flex items-center"
-                    >
-                      <span>은행별 금리 확인하기</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ml-1 transition-transform ${showRateInfo ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* 은행별 금리 정보 (토글) */}
-                  {showRateInfo && (
-                    <div className="mt-4 border border-blue-100 rounded-lg overflow-hidden transition-all duration-300 ease-in-out">
-                      <div className="bg-blue-50 px-4 py-2 border-b border-blue-100">
-                        <h3 className="font-medium text-blue-700">은행별 금리 비교</h3>
-                      </div>
-                      <div className="p-4 bg-white max-h-80 overflow-y-auto">
-                        <table className="w-full text-sm">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-2 py-2 text-left font-medium text-gray-700">은행명</th>
-                              <th className="px-2 py-2 text-center font-medium text-gray-700">기본금리</th>
-                              <th className="px-2 py-2 text-center font-medium text-gray-700">우대금리</th>
-                              <th className="px-2 py-2 text-center font-medium text-gray-700">총 금리</th>
-                              <th className="px-2 py-2 text-left font-medium text-gray-700">특별혜택</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {bankRates.map((bank) => (
-                              <tr key={bank.bankName} className="border-t border-gray-100">
-                                <td className="px-2 py-2 font-medium">{bank.bankName}</td>
-                                <td className="px-2 py-2 text-center">{bank.baseRate}%</td>
-                                <td className="px-2 py-2 text-center">{bank.additionalRate}%</td>
-                                <td className="px-2 py-2 text-center font-medium text-blue-600">{bank.totalRate}%</td>
-                                <td className="px-2 py-2">{bank.specialBenefits}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <div className="mt-3 text-right">
-                          <button 
-                            onClick={() => setShowRateInfo(false)}
-                            className="text-sm text-gray-500 hover:text-gray-700"
-                          >
-                            닫기
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -957,9 +807,9 @@ export default function MoneyCalculator() {
                   <p className="text-sm text-gray-500">
                     * 실제 수령액은 금리 변동, 납입 일정, 정부 정책 등에 따라 달라질 수 있습니다.
                     <br />
-                    {(militaryType === "육군" || militaryType === "해병") && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
-                    * {militaryType === "해군" && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
-                    {militaryType === "공군" && "이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
+                    {(militaryType === "육군" || militaryType === "해병대") && "* 이병/일병/상병/병장 복무 기간을 2/6/6/4개월로 계산하였습니다."}
+                    {militaryType === "해군" && "* 이병/일병/상병/병장 복무 기간을 2/6/6/6개월로 계산하였습니다."}
+                    {militaryType === "공군" && "* 이병/일병/상병/병장 복무 기간을 2/6/6/7개월로 계산하였습니다."}
                   </p>
                 </div>
               </CardContent>

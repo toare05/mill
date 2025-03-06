@@ -149,7 +149,7 @@ export default function ScoreCalculator() {
                     </SelectTrigger>
                     <SelectContent>
                       {RECRUITMENT_MONTH_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value} className="cursor-pointer">
                           {option.label}
                         </SelectItem>
                       ))}

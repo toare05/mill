@@ -1,51 +1,13 @@
 import { useState, useCallback, useMemo } from 'react';
+import { 
+  SavingsInputData, 
+  CalculationBreakdown, 
+  CalculationResult 
+} from '@/types';
 
-// 은행별 금리 정보 타입 정의
-interface BankInterestRate {
-  bankName: string;         // 은행 이름
-  baseRate: number;         // 기본 금리 (%)
-  additionalRate: number;   // 우대 금리 (%)
-  totalRate: number;        // 총 금리 (%)
-  specialBenefits: string;  // 특별 혜택
-  minDeposit?: number;      // 최소 납입액
-  maxDeposit?: number;      // 최대 납입액 (별도 한도가 있는 경우)
-  officialLink: string;     // 공식 웹사이트 링크
-}
-
-// 저축 입력 데이터 타입 정의
-interface SavingsInputData {
-  monthlySavings: number;          // 월 납입액
-  serviceMonths: number;           // 복무 개월 수
-  interestRate: number;            // 총 금리 (기본금리+우대금리)
-  governmentMatch: boolean;        // 정부 매칭 지원금
-  isYear2025: boolean;             // 2025년 이후 납입 여부 (한도 55만원)
-  selectedBank: string;            // 선택한 은행
-  militaryRank?: string;           // 군 계급 (선택사항)
-  monthlySavings2024?: number;     // 2024년 월 납입액 (만원)
-  monthlySavings2025?: number;     // 2025년 월 납입액 (만원)
-}
-
-// 계산 내역 타입 정의
-interface CalculationBreakdown {
-  totalDeposit: number;           // 총 납입액
-  baseInterest: number;           // 기본 이자
-  additionalInterest: number;     // 추가 이자
-  governmentMatch: number;        // 정부 매칭 지원금
-}
-
-// 계산 결과 타입 정의
-interface CalculationResult {
-  totalAmount: number;
-  breakdown: CalculationBreakdown;
-}
-
-/**
- * 장병내일준비적금 계산 기능을 제공하는 커스텀 훅
- */
-export function useSavingsCalculator(bankRates: BankInterestRate[]) {
-  // 기본 은행 선택
-  const defaultBank = bankRates.length > 0 ? bankRates[0].bankName : '';
-  const defaultInterestRate = bankRates.length > 0 ? bankRates[0].totalRate : 5.0;
+export function useSavingsCalculator() {
+  // 기본 금리 설정
+  const defaultInterestRate = 5.0;
 
   // 입력 데이터 상태
   const [inputData, setInputData] = useState<SavingsInputData>({
@@ -54,7 +16,6 @@ export function useSavingsCalculator(bankRates: BankInterestRate[]) {
     interestRate: defaultInterestRate,
     governmentMatch: true,
     isYear2025: false,
-    selectedBank: defaultBank,
     militaryRank: '',
     monthlySavings2024: 10,
     monthlySavings2025: 10
@@ -87,18 +48,6 @@ export function useSavingsCalculator(bankRates: BankInterestRate[]) {
   const handleIsYear2025Change = useCallback((value: boolean) => {
     setInputData(prev => ({ ...prev, isYear2025: value }));
   }, []);
-
-  // 은행 선택 변경 핸들러
-  const handleSelectedBankChange = useCallback((value: string) => {
-    const selectedBankData = bankRates.find(bank => bank.bankName === value);
-    const newInterestRate = selectedBankData ? selectedBankData.totalRate : defaultInterestRate;
-    
-    setInputData(prev => ({ 
-      ...prev, 
-      selectedBank: value,
-      interestRate: newInterestRate
-    }));
-  }, [bankRates, defaultInterestRate]);
 
   // 군 계급 변경 핸들러
   const handleMilitaryRankChange = useCallback((value: string) => {
@@ -178,7 +127,6 @@ export function useSavingsCalculator(bankRates: BankInterestRate[]) {
     handleInterestRateChange,
     handleGovernmentMatchChange,
     handleIsYear2025Change,
-    handleSelectedBankChange,
     handleMilitaryRankChange,
     handleMonthlySavings2024Change,
     handleMonthlySavings2025Change,
