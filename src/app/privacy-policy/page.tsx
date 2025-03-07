@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-xl font-semibold mb-3">7. 개인정보 처리방침 변경</h2>
             <p className="text-gray-700">
-              이 개인정보 처리방침은 2024년 2월 27일부터 적용됩니다. 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 공지사항을 통하여 고지할 것입니다.
+              이 개인정보 처리방침은 2024년 2월 28일부터 적용됩니다. 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 공지사항을 통하여 고지할 것입니다.
             </p>
           </section>
         </div>
