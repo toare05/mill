@@ -24,8 +24,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "계산기밀 | 대한민국 군 계산기 모음",
-  description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산과 장병내일준비적금 수령액 계산을 한 곳에서 이용해보세요.",
-  keywords: ["공군 점수계산","공군 점수", "장병내일준비적금", "군적금", "군적금 만기"],
+  description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산과 군적금(장병내일준비적금) 수령액 계산을 한 곳에서 이용해보세요.",
+  keywords: ["공군 점수계산","공군 점수", "장병내일준비적금","군적금", "군적금 계산", "군적금 만기"],
   authors: [{ name: "toare", url: "" }],
   creator: "toare",
   publisher: "toare",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "계산기밀 | 대한민국 군 계산기 모음",
-    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산, 장병내일준비적금(군적금) 수령액 계산 등 다양한 계산기를 제공합니다.",
+    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산, 군적금(장병내일준비적금) 수령액 계산 등 다양한 계산기를 제공합니다.",
     url: "https://allformilitary.site",
     siteName: "계산기밀",
     locale: "ko_KR",

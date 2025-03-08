@@ -41,12 +41,12 @@ export default function Home() {
           {/* 장병내일준비적금 계산기 카드 */}
           <Card className="bg-white rounded-xl shadow-md transition-all hover:shadow-lg border border-gray-100">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl font-bold text-green-700">장병내일준비적금 계산기</CardTitle>
+              <CardTitle className="text-2xl font-bold text-green-700">군적금(장병내일준비적금) 계산기</CardTitle>
               <CardDescription>군 적금 만기시 예상 수령액을 확인해보세요</CardDescription>
             </CardHeader>
             <CardContent className="pb-4">
               <p className="text-gray-600">
-                매월 적립액, 이자율, 복무기간 등을 입력하여 장병내일준비적금 만기시 
+                매월 적립액, 이자율, 복무기간 등을 입력하여 군적금(장병내일준비적금) 만기시 
                 받게 될 최종 수령액을 계산할 수 있습니다.
               </p>
             </CardContent>
