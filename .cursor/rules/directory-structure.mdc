@@ -3,22 +3,18 @@ description: Directory Structure
 globs: 
 alwaysApply: false
 ---
-
-# Your rule content
-
-- You can @ files here
-- You can use markdown but dont have to
-## Directory Structure
-- src
-- src/app: Next.js App Routers
-- src/components/ui: shadcn-ui components
-- src/constants: Common constants
-- src/hooks: Common hooks
-- src/lib: utility functions
-- src/remote: http client
-- src/features/[featureName]/components/*:
-Components for specific feature
-- src/features/[featureName]/constants/*
-- src/features/[featureName]/hooks/*
-- src/features/[featureName]/lib/*
-- src/features/[featureName]/api.ts: api fetch functions
+src/
+├── app/                    # Next.js App Router 관련 파일
+├── components/             # UI 컴포넌트
+│   └── ui/                # shadcn-ui 컴포넌트
+├── constants/              # 공통 상수
+├── hooks/                  # 공통 훅
+├── lib/                    # 유틸리티 함수
+├── remote/                 # HTTP 클라이언트 (API 호출 관련)
+└── features/               # 기능별 모듈
+    └── [featureName]/      # 특정 기능 폴더 (예: auth, user, todo 등)
+        ├── components/     # 기능별 컴포넌트
+        ├── constants/      # 기능별 상수
+        ├── hooks/          # 기능별 훅
+        ├── lib/            # 기능별 유틸리티
+        └── api.ts          # 기능별 API 호출 함수
