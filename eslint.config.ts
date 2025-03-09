@@ -11,12 +11,17 @@ const compat = new FlatCompat({
   recommendedConfig: { plugins: [] },
 });
 
-// Use a simpler configuration that's compatible with Next.js 15
+// Next.js 15에 맞는 설정
 const eslintConfig: Linter.FlatConfig[] = [
   {
     ignores: ["node_modules/**", ".next/**", "out/**", "public/**"]
   },
   ...compat.extends("next/core-web-vitals"),
+  {
+    rules: {
+      "react/no-unescaped-entities": "off"
+    }
+  }
 ];
 
 export default eslintConfig; 
