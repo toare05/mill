@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "계산기밀 | 대한민국 군 계산기 모음",
-    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산, 군적금(장병내일준비적금) 수령액 계산 등 다양한 계산기를 제공합니다.",
+    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산, 군적금(장병내일준비적금) 수령액 계산 다양한 계산기를 제공합니다.",
     url: "https://allformilitary.site",
     siteName: "계산기밀",
     locale: "ko_KR",
