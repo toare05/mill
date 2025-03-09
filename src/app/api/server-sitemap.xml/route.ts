@@ -1,4 +1,5 @@
 import { getServerSideSitemap, ISitemapField } from 'next-sitemap';
+import { getAllPosts } from '@/lib/blog';
 
 export async function GET() {
   const baseUrl = 'https://www.allformillitary.site';
@@ -29,10 +30,27 @@ export async function GET() {
       changefreq: 'weekly',
       priority: 1.0,
     },
+    // 블로그 메인 페이지 추가
+    {
+      loc: `${baseUrl}/blog`,
+      lastmod: new Date().toISOString(),
+      changefreq: 'daily',
+      priority: 0.8,
+    },
   ];
 
-  // 여기에 데이터베이스에서 동적으로 생성된 페이지 URL들을 추가할 수 있습니다
-  // 예: 블로그 포스트, 제품 목록 등
+  // 블로그 게시물 추가
+  const posts = getAllPosts();
   
-  return getServerSideSitemap(fields);
+  const blogPostFields = posts.map(post => ({
+    loc: `${baseUrl}/blog/${post.slug}`,
+    lastmod: new Date(post.date).toISOString(),
+    changefreq: 'weekly' as const,
+    priority: 0.7,
+  }));
+  
+  // 모든 URL을 결합
+  const allFields = [...fields, ...blogPostFields];
+  
+  return getServerSideSitemap(allFields);
 } 

@@ -1,13 +1,14 @@
 import { Feed } from 'feed';
 import { NextResponse } from 'next/server';
+import { getAllPosts } from '@/lib/blog';
 
 export async function GET() {
   const baseUrl = 'https://www.allformillitary.site';
   
   // Feed 객체 생성
   const feed = new Feed({
-    title: "공군 지원 1차 점수 계산기",
-    description: "공군 지원자들이 자신의 1차 점수를 계산할 수 있는 웹 애플리케이션입니다.",
+    title: "계산기밀 | 대한민국 군 계산기 모음",
+    description: "대한민국 군 관련 다양한 계산기를 제공합니다. 공군 지원 점수 계산과 군적금(장병내일준비적금) 수령액 계산을 한 곳에서 이용해보세요.",
     id: baseUrl,
     link: baseUrl,
     language: "ko",
@@ -31,20 +32,20 @@ export async function GET() {
   // 피드 항목 추가
   const pages = [
     {
-      title: "공군 지원 1차 점수 계산기",
-      description: "공군 지원자들이 자신의 1차 점수를 계산할 수 있는 웹 애플리케이션입니다.",
+      title: "계산기밀 - 메인페이지",
+      description: "대한민국 군 관련 다양한 계산기를 제공합니다.",
       url: baseUrl,
       date: new Date(),
     },
     {
-      title: "점수 계산기",
+      title: "공군 지원 점수 계산기",
       description: "공군 지원 1차 점수를 계산해주는 도구입니다.",
       url: `${baseUrl}/scorecalculator`,
       date: new Date(),
     },
     {
-      title: "돈 계산기",
-      description: "돈 계산을 도와주는 도구입니다.",
+      title: "장병내일준비적금 계산기",
+      description: "군적금 만기 수령액을 계산해주는 도구입니다.",
       url: `${baseUrl}/moneycalculator`,
       date: new Date(),
     },
@@ -54,9 +55,15 @@ export async function GET() {
       url: `${baseUrl}/privacy-policy`,
       date: new Date(),
     },
+    {
+      title: "블로그",
+      description: "군 생활과 관련된 유용한 정보, 팁, 가이드를 제공합니다.",
+      url: `${baseUrl}/blog`,
+      date: new Date(),
+    },
   ];
 
-  // 피드에 항목 추가
+  // 피드에 기본 항목 추가
   pages.forEach((page) => {
     feed.addItem({
       title: page.title,
@@ -64,6 +71,20 @@ export async function GET() {
       link: page.url,
       description: page.description,
       date: page.date,
+    });
+  });
+  
+  // 블로그 게시물 가져오기
+  const posts = getAllPosts();
+  
+  // 블로그 게시물을 피드에 추가
+  posts.forEach((post) => {
+    feed.addItem({
+      title: post.title,
+      id: `${baseUrl}/blog/${post.slug}`,
+      link: `${baseUrl}/blog/${post.slug}`,
+      description: post.description,
+      date: new Date(post.date),
     });
   });
 

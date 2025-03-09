@@ -3,8 +3,37 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+
+// 블로그 포스트 타입 정의
+interface BlogPost {
+  slug: string;
+  title: string;
+  date: string;
+  description: string;
+}
 
 export default function Home() {
+  // 클라이언트 사이드에서 최신 블로그 포스트 3개를 가져오기 위한 상태
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  
+  // 컴포넌트 마운트 시 최신 블로그 포스트 가져오기
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        const response = await fetch('/api/recent-posts');
+        if (response.ok) {
+          const posts = await response.json();
+          setRecentPosts(posts);
+        }
+      } catch (error) {
+        console.error('블로그 포스트를 가져오는 중 오류 발생:', error);
+      }
+    };
+    
+    fetchRecentPosts();
+  }, []);
+  
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 md:py-12 md:px-8">
       <div className="max-w-7xl mx-auto">
@@ -58,6 +87,52 @@ export default function Home() {
               </Link>
             </CardFooter>
           </Card>
+        </div>
+        
+        {/* 최신 블로그 포스트 섹션 */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-2">최신 블로그 포스트</h2>
+            <p className="text-gray-600">군 생활과 관련된 유용한 정보를 확인하세요</p>
+          </div>
+          
+          {recentPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentPosts.map((post) => (
+                <Card key={post.slug} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl font-bold text-blue-700 line-clamp-2">{post.title}</CardTitle>
+                    <CardDescription>{new Date(post.date).toLocaleDateString('ko-KR')}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <p className="text-gray-600 line-clamp-3">{post.description}</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Link href={`/blog/${post.slug}`} passHref className="w-full">
+                      <Button variant="outline" className="w-full">
+                        자세히 보기
+                      </Button>
+                    </Link>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-gray-500 mb-4">아직 게시된 블로그 글이 없습니다.</p>
+              <Link href="/blog" passHref>
+                <Button>블로그 방문하기</Button>
+              </Link>
+            </div>
+          )}
+          
+          <div className="text-center mt-8">
+            <Link href="/blog" passHref>
+              <Button variant="outline" className="px-6">
+                모든 블로그 글 보기
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </main>
