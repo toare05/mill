@@ -27,23 +27,25 @@ export default function BlogPage() {
             <p className="text-gray-500">아직 게시된 블로그 글이 없습니다.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
             {posts.map((post) => (
-              <Card key={post.slug} className="bg-white rounded-xl shadow-md transition-all hover:shadow-lg border border-gray-100">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-2xl font-bold text-blue-700">{post.title}</CardTitle>
-                  <CardDescription>{new Date(post.date).toLocaleDateString('ko-KR')}</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <p className="text-gray-600">{post.description}</p>
-                </CardContent>
-                <CardFooter>
+              <Card key={post.slug} className="bg-white rounded-xl shadow-md transition-all hover:shadow-lg border border-gray-100 flex flex-col md:flex-row overflow-hidden">
+                <div className="md:w-3/4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl font-bold text-blue-700">{post.title}</CardTitle>
+                    <CardDescription>{new Date(post.date).toLocaleDateString('ko-KR')}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <p className="text-gray-600">{post.description}</p>
+                  </CardContent>
+                </div>
+                <div className="md:w-1/4 flex items-center justify-center p-4 md:border-l border-gray-100">
                   <Link href={`/blog/${post.slug}`} passHref className="w-full">
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">
                       읽어보기
                     </Button>
                   </Link>
-                </CardFooter>
+                </div>
               </Card>
             ))}
           </div>
