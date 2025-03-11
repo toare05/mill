@@ -1,21 +1,12 @@
 import { SpecialtyType } from "@/types";
 
 // 모집 월 옵션
-export const RECRUITMENT_MONTH_OPTIONS = (() => {
-  const options = [];
-  
-  // 2024년 5월부터 2025년 12월까지
-  for (let year = 2024; year <= 2025; year++) {
-    const startMonth = year === 2024 ? 5 : 1;
-    const endMonth = 12;
-    
-    for (let month = startMonth; month <= endMonth; month++) {
-      options.push({
-        value: `${year}년 ${month}월`,
-        label: `${year}년 ${month}월`
-      });
-    }
-  }
-  
-  return options;
-})(); 
+export const RECRUITMENT_MONTH_OPTIONS = [
+  { value: "2025년 6월", label: "2025년 6월" },
+  { value: "2025년 7월", label: "2025년 7월" },
+  { value: "2025년 8월", label: "2025년 8월" },
+  { value: "2025년 9월", label: "2025년 9월" },
+  { value: "2025년 10월", label: "2025년 10월" },
+  { value: "2025년 11월", label: "2025년 11월" },
+  { value: "2025년 12월", label: "2025년 12월" }
+];
