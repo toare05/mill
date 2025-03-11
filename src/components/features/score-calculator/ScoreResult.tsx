@@ -1,11 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  SPECIALTY_DISPLAY_NAMES, 
-  getPreviousMonthCutoffScore,
-  getLastYearSameMonthCutoffScore
-} from "@/constants/cutoffScores";
 import { ScoreResult as ScoreResultType, SoldierType, SpecialtyType } from "@/types";
 import { useMemo } from "react";
 
@@ -16,6 +11,19 @@ interface ScoreResultProps {
   recruitmentMonth: string;
   specialty: SpecialtyType;
 }
+
+// 2025년 9월 이후 입대인지 확인하는 함수
+const isAfterSep2025 = (recruitmentMonth: string): boolean => {
+  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
+  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
+  
+  if (!yearMatch || !monthMatch) return false;
+  
+  const year = parseInt(yearMatch[1]);
+  const month = parseInt(monthMatch[1]);
+  
+  return (year > 2025) || (year === 2025 && month >= 9);
+};
 
 export default function ScoreResult({ 
   scoreResult, 
@@ -40,85 +48,8 @@ export default function ScoreResult({
     return "bg-red-500";
   };
 
-  // 커트라인 비교 관련 로직
-  // 특기 표시 이름
-  const specialtyDisplayName = SPECIALTY_DISPLAY_NAMES[specialty];
-  
-  // 모집월 파싱 및 비교 데이터 계산
-  const { year, month, previousMonthData, lastYearData } = useMemo(() => {
-    // 모집월 파싱 (예: "2025년 6월" -> { year: 2025, month: 6 })
-    const yearMatch = recruitmentMonth.match(/(\d{4})년/);
-    const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
-    
-    if (!yearMatch || !monthMatch) {
-      console.error("Invalid recruitment month format:", recruitmentMonth);
-      return { year: 0, month: 0, previousMonthData: null, lastYearData: null };
-    }
-    
-    const parsedYear = parseInt(yearMatch[1]);
-    const parsedMonth = parseInt(monthMatch[1]);
-    
-    // 이전 달 데이터
-    const prevMonthData = getPreviousMonthCutoffScore(parsedYear, parsedMonth, specialtyDisplayName);
-    
-    // 작년 같은 달 데이터
-    const lastYearMonthData = getLastYearSameMonthCutoffScore(parsedYear, parsedMonth, specialtyDisplayName);
-    
-    return { 
-      year: parsedYear, 
-      month: parsedMonth, 
-      previousMonthData: prevMonthData, 
-      lastYearData: lastYearMonthData 
-    };
-  }, [recruitmentMonth, specialtyDisplayName]);
-  
-  // 현재 점수와 커트라인 비교
-  const getComparisonResult = (cutoffScore: number | null) => {
-    if (cutoffScore === null || cutoffScore === 99999) return null;
-    
-    const diff = scoreResult.totalScore - cutoffScore;
-    
-    if (diff >= 0) {
-      return {
-        status: "pass",
-        diff: diff,
-        message: `커트라인보다 ${diff.toFixed(1)}점 높음`
-      };
-    } else {
-      return {
-        status: "fail",
-        diff: Math.abs(diff),
-        message: `커트라인보다 ${Math.abs(diff).toFixed(1)}점 낮음`
-      };
-    }
-  };
-  
-  // 비교 결과 메모이제이션
-  const { previousComparison, lastYearComparison } = useMemo(() => {
-    const prevComp = previousMonthData && previousMonthData.score !== null && previousMonthData.score !== 99999
-      ? getComparisonResult(previousMonthData.score) 
-      : null;
-    
-    const lastYearComp = lastYearData && lastYearData.score !== null && lastYearData.score !== 99999
-      ? getComparisonResult(lastYearData.score) 
-      : null;
-      
-    return { previousComparison: prevComp, lastYearComparison: lastYearComp };
-  }, [previousMonthData, lastYearData, scoreResult.totalScore]);
-  
-  // 상태에 따른 색상 클래스
-  const getStatusColorClass = (status: string | null) => {
-    if (status === "pass") return "text-green-600";
-    if (status === "fail") return "text-red-600";
-    return "text-gray-500";
-  };
-
-  // 커트라인 점수 표시 텍스트
-  const getCutoffScoreText = (score: number | null) => {
-    if (score === null) return "모집 정보 없음";
-    if (score === 99999) return "모집 없음";
-    return `${score}점`;
-  };
+  // 2025년 9월 이후 입대인지 확인
+  const isAfterSeptember2025 = isAfterSep2025(recruitmentMonth);
 
   return (
     <div className="sticky top-8">
@@ -222,51 +153,13 @@ export default function ScoreResult({
                   ></div>
                 </div>
               </div>
-            </div>
-
-            {/* 커트라인 비교 섹션 */}
-            <div className="pt-4 border-t border-gray-100">
-              <h4 className="font-medium mb-3">커트라인 비교</h4>
               
-              <div className="space-y-4">
-                {/* 이전 달 커트라인 */}
-                {previousMonthData && (
-                  <div className="border-b pb-3">
-                    <h3 className="font-medium text-sm text-gray-700 mb-1">
-                      {previousMonthData.year}년 {previousMonthData.month}월 모집 (이전 달)
-                    </h3>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm">커트라인: <span className="font-medium">{getCutoffScoreText(previousMonthData.score)}</span></p>
-                      </div>
-                      {previousComparison && (
-                        <div className={`text-sm font-medium ${getStatusColorClass(previousComparison.status)}`}>
-                          {previousComparison.message}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {/* 작년 같은 달 커트라인 */}
-                {lastYearData && (
-                  <div>
-                    <h3 className="font-medium text-sm text-gray-700 mb-1">
-                      {lastYearData.year}년 {lastYearData.month}월 모집 (작년 동월)
-                    </h3>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm">커트라인: <span className="font-medium">{getCutoffScoreText(lastYearData.score)}</span></p>
-                      </div>
-                      {lastYearComparison && (
-                        <div className={`text-sm font-medium ${getStatusColorClass(lastYearComparison.status)}`}>
-                          {lastYearComparison.message}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* 2025년 9월 이후 입대자 알림 */}
+              {isAfterSeptember2025 && (
+                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-xs text-red-600 font-medium">※ 2025년 9월 입대부터 한국사능력검정 및 한국어능력시험 가산점이 폐지되었습니다.</p>
+                </div>
+              )}
             </div>
 
             <div className="pt-4 border-t border-gray-100">

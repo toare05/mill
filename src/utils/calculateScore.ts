@@ -7,6 +7,19 @@ import {
 } from "@/constants/scores";
 import { ScoreResult, UserInputData } from "@/types";
 
+// 2025년 9월 이후 입대인지 확인하는 함수
+const isAfterSep2025 = (recruitmentMonth: string): boolean => {
+  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
+  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
+  
+  if (!yearMatch || !monthMatch) return false;
+  
+  const year = parseInt(yearMatch[1]);
+  const month = parseInt(monthMatch[1]);
+  
+  return (year > 2025) || (year === 2025 && month >= 9);
+};
+
 export function calculateScore(userData: UserInputData): ScoreResult {
   // 자격/면허 점수 계산
   let certificateScore = CERTIFICATE_SCORES[userData.soldierType][userData.certificate];
@@ -42,9 +55,19 @@ export function calculateScore(userData: UserInputData): ScoreResult {
   // 사회봉사활동과 헌혈 점수의 합계 (최대 8점)
   const socialBonusPoints = Math.min(volunteerBonusPoints + bloodDonationBonusPoints, 8);
   
+  // 2025년 9월 이후 입대인지 확인
+  const isAfterSeptember2025 = isAfterSep2025(userData.recruitmentMonth);
+  
   // 기타 가산점 계산 (사회봉사활동과 헌혈 제외)
   const otherBonusPoints = userData.bonusPoints
     .filter(bp => !bp.startsWith('volunteerHours') && !bp.startsWith('bloodDonation'))
+    .filter(bp => {
+      // 2025년 9월 이후 입대자는 한국사 능력검정과 한국어능력시험 가산점 제외
+      if (isAfterSeptember2025 && (bp.startsWith('koreanHistory') || bp.startsWith('koreanLanguage'))) {
+        return false;
+      }
+      return true;
+    })
     .reduce((sum, bp) => sum + BONUS_POINT_SCORES[bp], 0);
   
   // 총 가산점 (최대 15점)

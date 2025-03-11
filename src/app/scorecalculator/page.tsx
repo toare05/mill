@@ -148,7 +148,7 @@ export default function ScoreCalculator() {
                       <SelectValue placeholder="지원 월을 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
-                      {RECRUITMENT_MONTH_OPTIONS.map((option) => (
+                      {RECRUITMENT_MONTH_OPTIONS.map((option: { value: string; label: string }) => (
                         <SelectItem key={option.value} value={option.value} className="cursor-pointer">
                           {option.label}
                         </SelectItem>
