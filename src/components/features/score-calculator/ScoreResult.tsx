@@ -153,7 +153,7 @@ export default function ScoreResult({
 
             <div className="pt-4 border-t border-gray-100">
               <p className="text-sm text-gray-500">
-                ※ 면접 점수는 포함되지 않은 1차 점수입니다.
+                ※* 면접 점수는 포함되지 않은 1차 점수입니다.
               </p>
             </div>
           </div>
