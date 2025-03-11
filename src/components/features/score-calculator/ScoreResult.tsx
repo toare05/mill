@@ -32,14 +32,6 @@ export default function ScoreResult({
   recruitmentMonth,
   specialty
 }: ScoreResultProps) {
-  // 점수 퍼센트 계산
-  const calculatePercent = (score: number, max: number) => {
-    return Math.round((score / max) * 100);
-  };
-
-  // 총점 퍼센트
-  const totalPercent = useMemo(() => calculatePercent(scoreResult.totalScore, maxScore), [scoreResult.totalScore, maxScore]);
-
   // 점수 바 색상 결정
   const getScoreBarColor = (percent: number) => {
     if (percent >= 90) return "bg-green-500";
@@ -69,13 +61,10 @@ export default function ScoreResult({
               </div>
               <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
                 <div 
-                  className={`h-full ${getScoreBarColor(totalPercent)}`}
-                  style={{ width: `${totalPercent}%` }}
+                  className={`h-full ${getScoreBarColor(Math.round((scoreResult.totalScore / maxScore) * 100))}`}
+                  style={{ width: `${Math.round((scoreResult.totalScore / maxScore) * 100)}%` }}
                 ></div>
               </div>
-              <p className="text-right text-sm text-gray-500">
-                {totalPercent}%
-              </p>
             </div>
 
             {/* 세부 점수 */}
@@ -94,10 +83,10 @@ export default function ScoreResult({
                   <div 
                     className="h-full bg-blue-400"
                     style={{ 
-                      width: `${calculatePercent(
-                        scoreResult.certificateScore, 
-                        soldierType === 'general' ? 70 : 50
-                      )}%` 
+                      width: `${Math.round((
+                        scoreResult.certificateScore / 
+                        (soldierType === 'general' ? 70 : 50)
+                      ) * 100)}%` 
                     }}
                   ></div>
                 </div>
@@ -113,7 +102,7 @@ export default function ScoreResult({
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-green-400"
-                      style={{ width: `${calculatePercent(scoreResult.majorScore, 40)}%` }}
+                      style={{ width: `${Math.round((scoreResult.majorScore / 40) * 100)}%` }}
                     ></div>
                   </div>
                 </div>
@@ -131,10 +120,10 @@ export default function ScoreResult({
                   <div 
                     className="h-full bg-yellow-400"
                     style={{ 
-                      width: `${calculatePercent(
-                        scoreResult.attendanceScore, 
-                        soldierType === 'general' ? 20 : 10
-                      )}%` 
+                      width: `${Math.round((
+                        scoreResult.attendanceScore / 
+                        (soldierType === 'general' ? 20 : 10)
+                      ) * 100)}%` 
                     }}
                   ></div>
                 </div>
@@ -149,7 +138,7 @@ export default function ScoreResult({
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-purple-400"
-                    style={{ width: `${calculatePercent(scoreResult.bonusPointsScore, 15)}%` }}
+                    style={{ width: `${Math.round((scoreResult.bonusPointsScore / 15) * 100)}%` }}
                   ></div>
                 </div>
               </div>
