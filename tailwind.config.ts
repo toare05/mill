@@ -3,10 +3,22 @@ import type { Config } from 'tailwindcss';
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './src/pages/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}',
-    './src/app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}'
+  ],
+  safelist: [
+    'bg-background',
+    'text-foreground',
+    {
+      pattern: /(bg|text|border|ring)-(primary|secondary|accent|muted|destructive)/,
+      variants: ['hover', 'focus', 'active']
+    }
   ],
   prefix: "",
   theme: {
