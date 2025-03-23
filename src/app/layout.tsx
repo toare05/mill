@@ -116,10 +116,12 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased flex flex-col`}
       >
         <Header />
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
         <GoogleAnalytics />
       </body>
     </html>
