@@ -13,6 +13,14 @@ export interface Post {
   title: string;
   date: string;
   description: string;
+  author: string;
+  keywords: string[];
+  category: string;
+  thumbnail: string;
+  modifiedDate: string;
+  tags: string[];
+  readingTime: string;
+  isPublished: boolean;
 }
 
 // 모든 블로그 포스트의 메타데이터 가져오기
@@ -49,6 +57,14 @@ export function getAllPosts(): Post[] {
           title: metadata.title || '',
           date: metadata.date || '',
           description: metadata.description || '',
+          author: metadata.author || 'toare',
+          keywords: metadata.keywords || [],
+          category: metadata.category || '일반',
+          thumbnail: metadata.thumbnail || '/images/blog/default.jpg',
+          modifiedDate: metadata.modifiedDate || metadata.date || '',
+          tags: metadata.tags || [],
+          readingTime: metadata.readingTime || '5분',
+          isPublished: metadata.isPublished !== false,
         };
       } catch (error) {
         console.error(`Error parsing metadata for ${fileName}:`, error);
@@ -113,6 +129,14 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
         title: metadata.title || '',
         date: metadata.date || '',
         description: metadata.description || '',
+        author: metadata.author || 'toare',
+        keywords: metadata.keywords || [],
+        category: metadata.category || '일반',
+        thumbnail: metadata.thumbnail || '/images/blog/default.jpg',
+        modifiedDate: metadata.modifiedDate || metadata.date || '',
+        tags: metadata.tags || [],
+        readingTime: metadata.readingTime || '5분',
+        isPublished: metadata.isPublished !== false,
       };
     } catch (error) {
       console.error(`Error parsing metadata for ${slug}:`, error);
