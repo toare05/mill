@@ -3,6 +3,8 @@ import { ko } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import Script from 'next/script';
+import { TableOfContents } from './TableOfContents';
 
 interface BlogPostProps {
   title: string;
@@ -30,56 +32,92 @@ export default function BlogPost({
   readingTime,
   children 
 }: BlogPostProps) {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": description,
+    "image": thumbnail,
+    "author": {
+      "@type": "Person",
+      "name": author
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "계산기밀",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://allformilitary.site/android-chrome-512x512.png"
+      }
+    },
+    "datePublished": date,
+    "dateModified": modifiedDate,
+    "keywords": tags.join(", "),
+    "articleSection": category
+  };
+
   return (
-    <article className="max-w-4xl mx-auto px-4 py-8">
-      <header className="mb-8">
-        {thumbnail && (
-          <div className="relative w-full h-[400px] mb-6">
-            <Image
-              src={thumbnail}
-              alt={title}
-              fill
-              className="object-cover rounded-lg"
-              priority
-            />
+    <>
+      <Script id="blog-post-schema" type="application/ld+json">
+        {JSON.stringify(schemaData)}
+      </Script>
+      <div className="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+        <article className="flex-1">
+          <header className="mb-8">
+            {thumbnail && (
+              <div className="relative w-full h-[400px] mb-6">
+                <Image
+                  src={thumbnail}
+                  alt={title}
+                  fill
+                  className="object-cover rounded-lg"
+                  priority
+                />
+              </div>
+            )}
+            <div className="flex items-center gap-2 mb-4">
+              <Badge variant="secondary">{category}</Badge>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-500">{readingTime} 읽기</span>
+            </div>
+            <h1 className="text-4xl font-bold mb-2">{title}</h1>
+            {description && (
+              <p className="text-xl text-gray-600 mb-4">{description}</p>
+            )}
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <span>작성자: {author}</span>
+              </div>
+              <time dateTime={date}>
+                작성일: {format(new Date(date), 'PPP', { locale: ko })}
+              </time>
+              {modifiedDate !== date && (
+                <time dateTime={modifiedDate}>
+                  수정일: {format(new Date(modifiedDate), 'PPP', { locale: ko })}
+                </time>
+              )}
+            </div>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {tags.map(tag => (
+                  <Link key={tag} href={`/blog/tag/${tag}`}>
+                    <Badge variant="outline">#{tag}</Badge>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </header>
+          
+          <div className="prose prose-lg max-w-none">
+            {children}
           </div>
-        )}
-        <div className="flex items-center gap-2 mb-4">
-          <Badge variant="secondary">{category}</Badge>
-          <span className="text-gray-500">•</span>
-          <span className="text-gray-500">{readingTime} 읽기</span>
-        </div>
-        <h1 className="text-4xl font-bold mb-2">{title}</h1>
-        {description && (
-          <p className="text-xl text-gray-600 mb-4">{description}</p>
-        )}
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <div className="flex items-center gap-2">
-            <span>작성자: {author}</span>
+        </article>
+        <aside className="hidden lg:block w-64 relative">
+          <div className="sticky top-8">
+            <TableOfContents />
           </div>
-          <time dateTime={date}>
-            작성일: {format(new Date(date), 'PPP', { locale: ko })}
-          </time>
-          {modifiedDate !== date && (
-            <time dateTime={modifiedDate}>
-              수정일: {format(new Date(modifiedDate), 'PPP', { locale: ko })}
-            </time>
-          )}
-        </div>
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {tags.map(tag => (
-              <Link key={tag} href={`/blog/tag/${tag}`}>
-                <Badge variant="outline">#{tag}</Badge>
-              </Link>
-            ))}
-          </div>
-        )}
-      </header>
-      
-      <div className="prose prose-lg max-w-none">
-        {children}
+        </aside>
       </div>
-    </article>
+    </>
   );
 } 
