@@ -224,7 +224,7 @@ export default function MoneyCalculator() {
         end: { year: sergeantEndYear, month: sergeantEndMonth } 
       }
     };
-  }, [enlistmentMonth, enlistmentYear, militaryType, inputData.serviceMonths]);
+  }, [enlistmentMonth, enlistmentYear, militaryType]);
   
   // 계급별 월급 계산
   const calculateSalaryByRank = useCallback(() => {
@@ -263,7 +263,7 @@ export default function MoneyCalculator() {
     }
     
     return result;
-  }, [enlistmentMonth, enlistmentYear, militaryType, inputData.serviceMonths]);
+  }, [calculateRankPeriods]);
   
   // 장병내일준비적금 수령액 계산 함수
   const calculationResult = useMemo(() => {
