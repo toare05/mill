@@ -6,7 +6,26 @@ import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: '계산기밀 블로그 - 군 관련 정보',
-  description: '대한민국 군 관련 다양한 정보, 팁, 그리고 가이드를 제공합니다.',
+  description: '대한민국 군 관련 다양한 정보, 팁, 그리고 가이드를 제공합니다. 공군 지원 점수, 군적금 활용법 등 실용적인 정보를 확인하세요.',
+  keywords: ['군대 블로그', '군대 정보', '공군 지원', '군적금', '장병내일준비적금', '군 생활 팁'],
+  openGraph: {
+    title: '계산기밀 블로그 - 군 관련 정보',
+    description: '대한민국 군 관련 다양한 정보, 팁, 그리고 가이드를 제공합니다. 공군 지원 점수, 군적금 활용법 등 실용적인 정보를 확인하세요.',
+    url: 'https://www.allformillitary.site/blog',
+    siteName: '계산기밀',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function BlogPage() {
