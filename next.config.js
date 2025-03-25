@@ -5,7 +5,14 @@ const nextConfig = {
   /* config options here */
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   images: {
-    domains: ['allformillitary.site'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'allformillitary.site',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
   compress: true,
