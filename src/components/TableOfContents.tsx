@@ -13,19 +13,39 @@ interface HeadingItem {
   level: number;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]/g, '-') // 한글도 허용하되 특수문자는 -로 변경
+    .replace(/-+/g, '-') // 여러 개의 -를 하나로
+    .replace(/^-|-$/g, ''); // 시작과 끝의 - 제거
+}
+
 export function TableOfContents({ className }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<HeadingItem[]>([]);
   const [activeId, setActiveId] = useState<string>('');
 
   useEffect(() => {
-    const headingElements = Array.from(document.querySelectorAll('h2, h3, h4'))
+    // heading 요소들을 찾고 필요한 경우 id 생성
+    const headingElements = Array.from(document.querySelectorAll('h2, h3, h4'));
+    
+    // id가 없는 heading 요소들에 id 추가
+    headingElements.forEach(heading => {
+      if (!heading.id) {
+        heading.id = slugify(heading.textContent || '');
+      }
+    });
+
+    // heading 정보 수집
+    const headingItems = headingElements
       .map(heading => ({
         id: heading.id,
         text: heading.textContent || '',
         level: parseInt(heading.tagName.charAt(1)),
-      }));
+      }))
+      .filter(heading => heading.id !== ''); // 빈 id 필터링
     
-    setHeadings(headingElements);
+    setHeadings(headingItems);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -38,7 +58,7 @@ export function TableOfContents({ className }: TableOfContentsProps) {
       { rootMargin: '-20% 0px -35% 0px' }
     );
 
-    headingElements.forEach(heading => {
+    headingItems.forEach(heading => {
       const element = document.getElementById(heading.id);
       if (element) {
         observer.observe(element);
@@ -47,6 +67,10 @@ export function TableOfContents({ className }: TableOfContentsProps) {
 
     return () => observer.disconnect();
   }, []);
+
+  if (headings.length === 0) {
+    return null;
+  }
 
   return (
     <nav className={cn("space-y-1 text-sm", className)}>
