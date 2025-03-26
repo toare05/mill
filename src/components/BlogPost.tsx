@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import Script from 'next/script';
-import { TableOfContents } from './TableOfContents';
 
 interface BlogPostProps {
   title: string;
@@ -63,8 +62,8 @@ export default function BlogPost({
       <Script id="blog-post-schema" type="application/ld+json">
         {JSON.stringify(schemaData)}
       </Script>
-      <div className="max-w-6xl mx-auto px-4 py-8 flex gap-8">
-        <article className="flex-1">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <article className="w-full">
           <header className="mb-8">
             {thumbnail && (
               <div className="relative w-full h-[400px] mb-6">
@@ -114,11 +113,6 @@ export default function BlogPost({
             {children}
           </div>
         </article>
-        <aside className="hidden lg:block w-64 relative">
-          <div className="sticky top-8">
-            <TableOfContents />
-          </div>
-        </aside>
       </div>
     </>
   );

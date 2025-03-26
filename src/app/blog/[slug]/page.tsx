@@ -3,14 +3,13 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAllPostSlugs } from '@/lib/blog';
 import { Button } from '@/components/ui/button';
-import dynamic from 'next/dynamic';
 
 type BlogParams = { slug: string };
 
 export async function generateMetadata({ params }: { params: Promise<BlogParams> }): Promise<Metadata> {
-  const { slug } = await params;
   try {
-    const Post = await import(`@/data/blog/${slug}.mdx`);
+    const resolvedParams = await params;
+    const Post = await import(`@/data/blog/${resolvedParams.slug}.mdx`);
     const metadata = Post.metadata;
 
     return {
@@ -30,10 +29,14 @@ export async function generateStaticParams() {
   return paths;
 }
 
-export default async function BlogPost({ params }: { params: Promise<BlogParams> }) {
-  const { slug } = await params;
+interface PageProps {
+  params: Promise<BlogParams>;
+}
+
+export default async function BlogPost({ params }: PageProps) {
   try {
-    const Post = await import(`@/data/blog/${slug}.mdx`);
+    const resolvedParams = await params;
+    const Post = await import(`@/data/blog/${resolvedParams.slug}.mdx`);
     const Content = Post.default;
     const metadata = Post.metadata;
 
@@ -43,21 +46,23 @@ export default async function BlogPost({ params }: { params: Promise<BlogParams>
           <div className="mb-8">
             <Link href="/blog" passHref>
               <Button variant="outline" className="mb-6">
-                ← Back to blog list
+                ← 블로그 목록으로
               </Button>
             </Link>
             
-            <Content />
+            <article className="prose prose-lg max-w-none">
+              <Content />
+            </article>
           </div>
           
           <div className="mt-8 border-t border-gray-200 pt-8">
-            <h2 className="text-xl font-bold mb-4">calculate secret services</h2>
+            <h2 className="text-xl font-bold mb-4">계산기밀 서비스</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link href="/scorecalculator" className="text-blue-600 hover:underline block p-3 bg-blue-50 rounded-lg">
-                Use the Air Force Support Score Calculator
+                공군 지원 점수 계산기 사용하기
               </Link>
               <Link href="/moneycalculator" className="text-green-600 hover:underline block p-3 bg-green-50 rounded-lg">
-                Use the Soldiers' Tomorrow Preparation Fund Calculator
+                장병내일준비적금 계산기 사용하기
               </Link>
             </div>
           </div>
@@ -65,6 +70,7 @@ export default async function BlogPost({ params }: { params: Promise<BlogParams>
       </main>
     );
   } catch (error) {
+    console.error('Error loading blog post:', error);
     notFound();
   }
 }
