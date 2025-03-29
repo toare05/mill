@@ -10,39 +10,24 @@ import Script from 'next/script';
 interface BlogPostProps {
   title: string;
   date: string;
-  description?: string;
-  author: string;
   keywords: string[];
-  category: string;
   thumbnail: string;
   modifiedDate: string;
-  tags: string[];
-  readingTime: string;
   children: React.ReactNode;
 }
 
 export default function BlogPost({ 
   title, 
   date, 
-  description, 
-  author, 
-  category,
   thumbnail,
   modifiedDate,
-  tags,
-  readingTime,
   children 
 }: BlogPostProps) {
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": title,
-    "description": description,
     "image": thumbnail,
-    "author": {
-      "@type": "Person",
-      "name": author
-    },
     "publisher": {
       "@type": "Organization",
       "name": "계산기밀",
@@ -52,9 +37,7 @@ export default function BlogPost({
       }
     },
     "datePublished": date,
-    "dateModified": modifiedDate,
-    "keywords": tags.join(", "),
-    "articleSection": category
+    "dateModified": modifiedDate
   };
 
   return (
@@ -76,19 +59,8 @@ export default function BlogPost({
                 />
               </div>
             )}
-            <div className="flex items-center gap-2 mb-4">
-              <Badge variant="secondary">{category}</Badge>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-500">{readingTime} 읽기</span>
-            </div>
             <h1 className="text-4xl font-bold mb-2">{title}</h1>
-            {description && (
-              <p className="text-xl text-gray-600 mb-4">{description}</p>
-            )}
             <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <span>작성자: {author}</span>
-              </div>
               <time dateTime={date}>
                 작성일: {format(new Date(date), 'PPP', { locale: ko })}
               </time>
@@ -98,15 +70,6 @@ export default function BlogPost({
                 </time>
               )}
             </div>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {tags.map(tag => (
-                  <Link key={tag} href={`/blog/tag/${tag}`}>
-                    <Badge variant="outline">#{tag}</Badge>
-                  </Link>
-                ))}
-              </div>
-            )}
           </header>
           
           <div className="prose prose-lg max-w-none">
