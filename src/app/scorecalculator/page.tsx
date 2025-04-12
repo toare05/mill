@@ -29,7 +29,7 @@ export default function ScoreCalculator() {
     major: "nonMajor",
     attendance: "absence0",
     bonusPoints: [],
-    recruitmentMonth: "2025년 6월", // 기본값을 2025년 6월로 설정
+    recruitmentMonth: "2025년 7월", // 기본값을 2025년 7월로 설정
     specialty: "general" // 기본값은 일반(기술)
   };
 
