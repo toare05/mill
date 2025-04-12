@@ -82,7 +82,7 @@ export default function MoneyCalculator() {
   const [inputData, setInputData] = useState<SavingsInputData>(initialInputData);
   
   // 입대월 상태
-  const [enlistmentMonth, setEnlistmentMonth] = useState("7");
+  const [enlistmentMonth, setEnlistmentMonth] = useState("8");
   // 입대연도 상태
   const [enlistmentYear, setEnlistmentYear] = useState("2025");
   // 군 종류 상태
