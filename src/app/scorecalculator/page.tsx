@@ -29,7 +29,7 @@ export default function ScoreCalculator() {
     major: "nonMajor",
     attendance: "absence0",
     bonusPoints: [],
-    recruitmentMonth: "2025년 10월", // 기본값을 2025년 8월로 설정
+    recruitmentMonth: "2025년 11월", // 기본값을 2025년 11월로 설정
     specialty: "general" // 기본값은 일반(기술)
   };
 
@@ -149,7 +149,7 @@ export default function ScoreCalculator() {
                     </SelectTrigger>
                     <SelectContent>
                       {RECRUITMENT_MONTH_OPTIONS.map((option: { value: string; label: string }) => (
-                        <SelectItem key={option.value} value={option.value} className="cursor-pointer">
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
                       ))}
@@ -157,8 +157,8 @@ export default function ScoreCalculator() {
                   </Select>
                 </div>
                 
-                <Tabs defaultValue="general" onValueChange={(value) => handleSoldierTypeChange(value as SoldierType)}>
-                  <TabsList className="mb-6 w-full">
+                <Tabs value={userData.soldierType} onValueChange={(value) => handleSoldierTypeChange(value as SoldierType)} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
                     <TabsTrigger value="general" className="flex-1">일반기술병</TabsTrigger>
                     <TabsTrigger value="specialized" className="flex-1">전문기술병</TabsTrigger>
                   </TabsList>

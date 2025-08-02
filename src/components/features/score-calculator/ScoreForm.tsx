@@ -26,19 +26,6 @@ interface ScoreFormProps {
   onBonusPointsChange: (bonusPoints: BonusPointType[]) => void;
 }
 
-// 2025년 9월 이후 입대인지 확인하는 함수
-const isAfterSep2025 = (recruitmentMonth: string): boolean => {
-  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
-  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
-  
-  if (!yearMatch || !monthMatch) return false;
-  
-  const year = parseInt(yearMatch[1]);
-  const month = parseInt(monthMatch[1]);
-  
-  return (year > 2025) || (year === 2025 && month >= 9);
-};
-
 export default function ScoreForm({
   userData,
   onCertificateChange,
@@ -53,8 +40,6 @@ export default function ScoreForm({
       
       // 같은 카테고리의 다른 항목 제거 (중복 선택 방지)
       const categoryPrefixes = [
-        'koreanHistory', 
-        'koreanLanguage', 
         'englishToeic', 
         'englishToefl', 
         'englishTeps',
@@ -91,9 +76,6 @@ export default function ScoreForm({
     
     return options;
   };
-
-  // 2025년 9월 이후 입대인지 확인
-  const isAfterSeptember2025 = isAfterSep2025(userData.recruitmentMonth);
 
   return (
     <div className="space-y-6">
@@ -274,48 +256,11 @@ export default function ScoreForm({
           </div>
         </div>
         
-        {/* 자격증 및 영어 성적 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 자격증 관련 */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">자격증 관련</h4>
-            <div className="space-y-2">
-              {isAfterSeptember2025 && (
-                <div className="p-2 bg-red-50 border border-red-200 rounded-md mb-2">
-                  <p className="text-xs text-red-600 font-medium">※ 2025년 9월 입대부터 한국사능력검정 및 한국어능력시험 가산점이 폐지되었습니다.</p>
-                </div>
-              )}
-              
-              {BONUS_POINT_OPTIONS.find(cat => cat.category === '자격증 관련')?.options.map((option) => {
-                const isKoreanCert = option.value.startsWith('koreanHistory') || option.value.startsWith('koreanLanguage');
-                const isDisabled = isAfterSeptember2025 && isKoreanCert;
-                
-                return (
-                  <div key={option.value} className="checkbox-option">
-                    <Checkbox 
-                      id={option.value} 
-                      checked={userData.bonusPoints.includes(option.value)}
-                      onCheckedChange={(checked) => 
-                        handleBonusPointChange(checked as boolean, option.value)
-                      }
-                      disabled={isDisabled}
-                    />
-                    <Label 
-                      htmlFor={option.value} 
-                      className={`ml-2 ${isDisabled ? 'line-through text-red-500' : ''}`}
-                    >
-                      {option.label}
-                      {isDisabled && <span className="text-xs ml-1 text-red-500">(폐지)</span>}
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          
+        {/* 영어 성적만 표시 (한국사/한국어는 2025년 9월 이후 폐지) */}
+        <div className="grid grid-cols-1 gap-4">
           {/* 영어 성적 */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">영어 성적</h4>
+            <h4 className="text-sm font-medium text-gray-700 border-b pb-1 mb-2">영어 성적 가산점</h4>
             <div className="space-y-2">
               {BONUS_POINT_OPTIONS.find(cat => cat.category === '영어 성적')?.options.map((option) => (
                 <div key={option.value} className="checkbox-option">

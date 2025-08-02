@@ -12,19 +12,6 @@ interface ScoreResultProps {
   specialty: SpecialtyType;
 }
 
-// 2025년 9월 이후 입대인지 확인하는 함수
-const isAfterSep2025 = (recruitmentMonth: string): boolean => {
-  const yearMatch = recruitmentMonth.match(/(\d{4})년/);
-  const monthMatch = recruitmentMonth.match(/(\d{1,2})월/);
-  
-  if (!yearMatch || !monthMatch) return false;
-  
-  const year = parseInt(yearMatch[1]);
-  const month = parseInt(monthMatch[1]);
-  
-  return (year > 2025) || (year === 2025 && month >= 9);
-};
-
 export default function ScoreResult({ 
   scoreResult, 
   soldierType, 
@@ -39,9 +26,6 @@ export default function ScoreResult({
     if (percent >= 50) return "bg-yellow-500";
     return "bg-red-500";
   };
-
-  // 2025년 9월 이후 입대인지 확인
-  const isAfterSeptember2025 = isAfterSep2025(recruitmentMonth);
 
   return (
     <div className="sticky top-8">
@@ -143,17 +127,12 @@ export default function ScoreResult({
                 </div>
               </div>
               
-              {/* 2025년 9월 이후 입대자 알림 */}
-              {isAfterSeptember2025 && (
-                <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-xs text-red-600 font-medium">※ 2025년 9월 입대부터 한국사능력검정 및 한국어능력시험 가산점이 폐지되었습니다.</p>
-                </div>
-              )}
+
             </div>
 
             <div className="pt-4 border-t border-gray-100">
               <p className="text-sm text-gray-500">
-                ※* 면접 점수는 포함되지 않은 1차 점수입니다.
+                ※ 면접 점수는 포함되지 않은 1차 점수입니다.
               </p>
             </div>
           </div>

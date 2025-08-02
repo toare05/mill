@@ -16,7 +16,7 @@ export const CERTIFICATE_SCORES: Record<SoldierType, Record<CertificateType, num
     learningL4L3: 68,
     learningL2: 66,
     certified: 64,
-    uncertified: 62,
+    uncertified: 60, // 2025년 9월 이후 미소지와 동일
     largeSpecial: 0, // 일반기술병에는 해당 없음
     type1Manual: 0, // 일반기술병에는 해당 없음
     type2Manual: 0, // 일반기술병에는 해당 없음
@@ -30,7 +30,7 @@ export const CERTIFICATE_SCORES: Record<SoldierType, Record<CertificateType, num
     learningL4L3: 45,
     learningL2: 40,
     certified: 30,
-    uncertified: 26,
+    uncertified: 20, // 2025년 9월 이후 미소지와 동일
     largeSpecial: 50, // 차량운전 직종에만 해당
     type1Manual: 45, // 차량운전 직종에만 해당
     type2Manual: 40, // 차량운전 직종에만 해당
@@ -129,10 +129,7 @@ export const BONUS_POINT_SCORES: Record<BonusPointType, number> = {
   chemicalDriverLicense: 4,
   aircraftMaintenance: 4,
   careerDesignRecommendation: 1,
-  koreanHistory34: 1,
-  koreanHistory12: 2,
-  koreanLanguage34: 1,
-  koreanLanguage12: 2,
+  // 한국사/한국어 가산점은 2025년 9월 이후 폐지
   englishToeic520to729: 1,
   englishToeic730plus: 2,
   englishToefl59to81: 1,

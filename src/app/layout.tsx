@@ -108,7 +108,8 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`$GeistSans.variable} ${GeistMono.variable} min-h-screen bg-background font-sans antialiased flex flex-col`}
+        className={`${GeistSans.variable} ${GeistMono.variable} min-h-screen bg-background font-sans antialiased flex flex-col`}
+        suppressHydrationWarning={true}
       >
         <Header />
         <main className="flex-1">

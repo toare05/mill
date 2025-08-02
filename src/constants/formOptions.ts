@@ -22,7 +22,7 @@ export const CERTIFICATE_OPTIONS = {
     { value: 'learningL4L3' as CertificateType, label: '일학습병행 자격증 - L4, L3 (68점)' },
     { value: 'learningL2' as CertificateType, label: '일학습병행 자격증 - L2 (66점)' },
     { value: 'certified' as CertificateType, label: '일반자격증 - 공인 (64점)' },
-    { value: 'uncertified' as CertificateType, label: '일반자격증 - 비공인 (62점)' },
+    { value: 'uncertified' as CertificateType, label: '일반자격증 - 비공인 (미소지와 동일)' },
     { value: 'none' as CertificateType, label: '미소지 (60점)' }
   ],
   specialized: [
@@ -33,7 +33,7 @@ export const CERTIFICATE_OPTIONS = {
     { value: 'learningL4L3' as CertificateType, label: '일학습병행 자격증 - L4, L3 (45점)' },
     { value: 'learningL2' as CertificateType, label: '일학습병행 자격증 - L2 (40점)' },
     { value: 'certified' as CertificateType, label: '일반자격증 - 공인 (30점)' },
-    { value: 'uncertified' as CertificateType, label: '일반자격증 - 비공인 (26점)' },
+    { value: 'uncertified' as CertificateType, label: '일반자격증 - 비공인 (미소지와 동일)' },
     { value: 'largeSpecial' as CertificateType, label: '운전면허증 - 대형/특수 (차량운전 직종만) (50점)' },
     { value: 'type1Manual' as CertificateType, label: '운전면허증 - 1종보통(수동) (차량운전 직종만) (45점)' },
     { value: 'type2Manual' as CertificateType, label: '운전면허증 - 2종보통(수동) (차량운전 직종만) (40점)' },
@@ -134,15 +134,7 @@ export const BONUS_POINT_OPTIONS = [
       { value: 'careerDesignRecommendation' as BonusPointType, label: '병역진로설계 군 추천특기 지원자 (1점)' }
     ]
   },
-  {
-    category: '자격증 관련',
-    options: [
-      { value: 'koreanHistory34' as BonusPointType, label: '한국사능력검정 3, 4급 (1점)' },
-      { value: 'koreanHistory12' as BonusPointType, label: '한국사능력검정 1, 2급 (2점)' },
-      { value: 'koreanLanguage34' as BonusPointType, label: '한국어능력시험 3, 4급 (1점)' },
-      { value: 'koreanLanguage12' as BonusPointType, label: '한국어능력시험 1, 2급 (2점)' }
-    ]
-  },
+
   {
     category: '영어 성적',
     options: [
@@ -154,4 +146,10 @@ export const BONUS_POINT_OPTIONS = [
       { value: 'englishTeps277plus' as BonusPointType, label: 'New TEPS 277 이상 (2점)' }
     ]
   }
-]; 
+];
+
+// 지원 가능한 모집 월 (2025년 9월 이후)
+export const RECRUITMENT_MONTH_OPTIONS = [
+  { value: '2025년 11월', label: '2025년 11월' },
+  { value: '2025년 12월', label: '2025년 12월' }
+];

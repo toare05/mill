@@ -84,10 +84,7 @@ export type BonusPointType =
   | 'chemicalDriverLicense' // 화생방 직종(2종 보통 이상 운전면허소지자)
   | 'aircraftMaintenance' // 항공정비사(기사급) 또는 항공정비 기초인력 인증서 소지자
   | 'careerDesignRecommendation' // 병역진로설계 군 추천특기 지원자
-  | 'koreanHistory34' // 한국사능력검정 3, 4급
-  | 'koreanHistory12' // 한국사능력검정 1, 2급
-  | 'koreanLanguage34' // 한국어능력시험 3, 4급
-  | 'koreanLanguage12' // 한국어능력시험 1, 2급
+  // 한국사/한국어 가산점은 2025년 9월 이후 폐지
   | 'englishToeic520to729' // TOEIC 520 ~ 729
   | 'englishToeic730plus' // TOEIC 730 이상
   | 'englishToefl59to81' // TOEFL 59 ~ 81
